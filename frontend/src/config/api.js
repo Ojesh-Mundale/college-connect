@@ -1,11 +1,13 @@
 import axios from 'axios';
 
 // Centralized API configuration
-const API_URL = process.env.VITE_API_URL; // /http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL;  // Vite env variables
 
 // Configure axios defaults
-axios.defaults.baseURL = API_URL;
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true, // optional, agar cookies/session use karte ho
+});
 
-// Export for use in components
 export { API_URL };
-export default axios;
+export default api;
