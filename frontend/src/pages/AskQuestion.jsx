@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/api';
 import { useAuth } from '../context/AuthContext';
 
 const AskQuestion = () => {
@@ -24,7 +24,7 @@ const AskQuestion = () => {
     setError('');
 
     try {
-      const response = await axios.post('/api/questions', formData);
+      const response = await api.post('/api/questions', formData);
       navigate(`/question/${response.data._id}`);
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to create question');

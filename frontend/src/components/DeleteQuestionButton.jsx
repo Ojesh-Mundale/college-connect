@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../config/api';
 import { useAuth } from '../context/AuthContext';
 
 const DeleteQuestionButton = ({ questionId, authorId, onDelete }) => {
@@ -11,7 +11,7 @@ const DeleteQuestionButton = ({ questionId, authorId, onDelete }) => {
 
     setIsDeleting(true);
     try {
-      await axios.delete(`/api/questions/${questionId}`, {
+      await axio.delete(`/api/questions/${questionId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

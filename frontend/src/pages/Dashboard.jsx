@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from '../config/api';
+import api from '../config/api';
 import DeleteQuestionButton from '../components/DeleteQuestionButton';
 
 const Dashboard = () => {
@@ -38,7 +38,7 @@ const Dashboard = () => {
         url += `?subject=${filter}`;
       }
 
-      const response = await axios.get(url);
+      const response = await api.get(url);
       const questionsData = response.data.questions || [];
       
       setQuestions(questionsData);
@@ -71,7 +71,7 @@ const Dashboard = () => {
   const handleDeleteQuestion = async (questionId) => {
     if (window.confirm('Are you sure you want to delete this question?')) {
       try {
-        await axios.delete(`/api/questions/${questionId}`, {
+        await api.delete(`/api/questions/${questionId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -87,7 +87,7 @@ const Dashboard = () => {
   const handleResolveQuestion = async (questionId, isResolved) => {
     try {
       const endpoint = isResolved ? 'unresolve' : 'resolve';
-      await axios.post(`/api/questions/${questionId}/${endpoint}`, {}, {
+      await api.post(`/api/questions/${questionId}/${endpoint}`, {}, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

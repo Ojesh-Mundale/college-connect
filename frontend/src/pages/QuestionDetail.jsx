@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../config/api';
 import DeleteQuestionButton from '../components/DeleteQuestionButton';
 
 const QuestionDetail = () => {
@@ -21,7 +21,7 @@ const QuestionDetail = () => {
   const fetchQuestion = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/questions/${id}`);
+      const response = await api.get(`/api/questions/${id}`);
       setQuestion(response.data);
       setAnswers(response.data.answers || []);
     } catch (error) {
@@ -41,7 +41,7 @@ const QuestionDetail = () => {
 
     setSubmittingAnswer(true);
     try {
-      const response = await axios.post('/api/answers', {
+      const response = await api.post('/api/answers', {
         content: newAnswer,
         questionId: id
       }, {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../config/api';
 
 const Leaderboard = () => {
   const { user } = useAuth();
@@ -14,7 +14,7 @@ const Leaderboard = () => {
 
   const fetchLeaderboard = async () => {
     try {
-      const response = await axios.get('/api/users/leaderboard');
+     const response = await api.get('/api/users/leaderboard');
       setLeaderboard(response.data);
       setLoading(false);
     } catch (err) {
