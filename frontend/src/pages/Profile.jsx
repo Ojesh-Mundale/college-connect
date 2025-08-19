@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import axios from '../config/api';
 
 const Profile = () => {
   const { user, logout } = useAuth();
@@ -26,7 +26,7 @@ const Profile = () => {
     if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete('http://localhost:5000/api/users/delete-account', {
+        await axios.delete('/api/users/delete-account', {
           headers: { Authorization: `Bearer ${token}` }
         });
         logout();
@@ -53,7 +53,7 @@ const Profile = () => {
         console.log('Using token:', token ? 'Token exists' : 'No token');
         
         const response = await axios.get(
-          `http://localhost:5000/api/questions/user/${user.email}`,
+          `/api/questions/user/${user.email}`,
           {
             headers: { Authorization: `Bearer ${token}` }
           }

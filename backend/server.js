@@ -17,15 +17,22 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+// Socket.io setup with CORS
 const io = socketIo(server, {
   cors: {
     origin: process.env.FRONTEND_URL || "http://localhost:5173",
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
   }
 });
 
-// Middleware
-app.use(cors());
+// Middleware for HTTP requests with CORS
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -33,13 +40,9 @@ app.use(express.urlencoded({ extended: true }));
 mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/collegeconnect', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => {
-  console.log('Connected to MongoDB');
-});
+})
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => console.error('MongoDB connection error:', err));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -54,7 +57,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Socket.io for real-time notifications
+// Socket.io real-time notifications
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
@@ -67,7 +70,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// Make io accessible to routes
+// Make io accessible in routes
 app.set('io', io);
 
 // Error handling middleware
