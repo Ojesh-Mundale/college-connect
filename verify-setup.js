@@ -4,7 +4,7 @@
 console.log('=== College Connect Configuration Check ===\n');
 
 console.log('Frontend Configuration:');
-console.log('- Environment variable: REACT_APP_API_URL');
+console.log('- Environment variable: VITE_API_URL');
 console.log('- Local API URL: http://localhost:5000');
 console.log('- Production API URL: https://college-connect-iufs.onrender.com\n');
 
@@ -22,5 +22,5 @@ console.log('\n2. For production:');
 console.log('   - Backend: https://college-connect-iufs.onrender.com/api/health');
 console.log('   - Frontend: https://college-connect-website.onrender.com');
 console.log('\n3. Environment variables should be set in:');
-console.log('   - Frontend .env file: REACT_APP_API_URL');
+console.log('   - Frontend .env file: VITE_API_URL');
 console.log('   - Backend .env file: MONGO_URI, PORT, FRONTEND_URL, JWT_SECRET');
