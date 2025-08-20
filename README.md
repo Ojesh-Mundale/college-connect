@@ -4,7 +4,7 @@
 Many students in India, especially in Tier 2/3 cities, face challenges in getting timely and accurate answers to their academic doubts. Traditional tutoring is expensive, and online communities are often slow or unreliable. Existing platforms are cluttered with content from 1st to 12th grade, making it difficult for engineering students to find relevant solutions.
 
 ## 🚀 Our Solution
-collegeconnect AI is a **college-specific** web-based platform that allows students to:
+College Connect AI is a **college-specific** web-based platform that allows students to:
 - Ask academic questions tailored to their engineering curriculum
 - Receive instant AI-generated answers using GPT-4o or OPENAI or (Gemini added for backup)
 - Get help from senior students who've faced similar challenges
