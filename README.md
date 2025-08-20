@@ -20,6 +20,7 @@ College Connect AI is a **college-specific** web-based platform that allows stud
 - **20-word AI answer limit for quick consumption**
 - **Shine on the leaderboard with highest points among peers**
 - **User Profiles**: Track reputation, badges, and contribution history
+- **Free 50 points after signup for the first time**
 
 ## 🛠️ Tech Stack
 - **Frontend:** React (Vite), Tailwind CSS, Framer Motion
@@ -28,15 +29,14 @@ College Connect AI is a **college-specific** web-based platform that allows stud
 - **AI:** OpenAI GPT-4o / Google Gemini
 
  ## 🖼️ Screenshots
-
-![Homepage](images/homepage.png)  
 *Homepage with AI-powered doubt solving*
+![Homepage](images/homepage.png)  
 <br>
-
 ![Dashboard](images/dashboard.png)  
 *Student dashboard showing questions and answers*
+<br>
 ![Dashboard](images/dashboard-1.png)  
-
+<br>
 ![LeaderBoard](images/leaderboard.png)  
 *Student dashboard showing questions and answers*
 
