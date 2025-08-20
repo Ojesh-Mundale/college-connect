@@ -38,10 +38,6 @@ College Connect AI is a **college-specific** web-based platform that allows stud
 ![LeaderBoard](images/leaderboard.png)  
 *Student dashboard showing questions and answers*
 
-![Mobile View](images/mobile-view.png)  
-*Responsive mobile-friendly interface*
-
-
 ## 🚀 Quick Start
 
 ### Prerequisites
