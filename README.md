@@ -27,6 +27,21 @@ College Connect AI is a **college-specific** web-based platform that allows stud
 - **Database:** MongoDB (Atlas or local)
 - **AI:** OpenAI GPT-4o / Google Gemini
 
+ ## 🖼️ Screenshots
+
+![Homepage](images/homepage.png)  
+*Homepage with AI-powered doubt solving*
+
+![Dashboard](images/dashboard.png)  
+*Student dashboard showing questions and answers*
+
+![LeaderBoard](images/leaderboard.png)  
+*Student dashboard showing questions and answers*
+
+![Mobile View](images/mobile-view.png)  
+*Responsive mobile-friendly interface*
+
+
 ## 🚀 Quick Start
 
 ### Prerequisites
