@@ -9,7 +9,7 @@ const Home = () => {
           Welcome to College Connect
         </h1>
         <p className="text-xl text-gray-600 mb-8">
-          Your AI-powered educational companion for asking questions and getting intelligent answers
+         “Peer-to-peer learning with AI-powered answers.”
         </p>
         <Link
           to="/ask"
@@ -35,8 +35,7 @@ const Home = () => {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-xl font-semibold mb-3 text-pink-600">Track Progress</h3>
           <p className="text-gray-600">
-            Monitor your learning journey and achievements
-          </p>
+            Monitor your learning journey along with leaderboard features          </p>
         </div>
       </div>
     </div>
