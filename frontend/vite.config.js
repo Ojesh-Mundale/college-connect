@@ -6,6 +6,7 @@ export default defineConfig({
   server: {
     host: true, // <-- allows access from other devices on the network
     port: 3000,
+     sourcemap: true, 
     proxy: {
       '/api': {
         target: 'http://localhost:5000',

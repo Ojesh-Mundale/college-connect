@@ -1,10 +1,11 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL; // ✅ correct
+// Use only the URL from env, no 'VITE_API_URL='
+const API_URL = import.meta.env.VITE_API_URL;
 
-const api = api.create({
-  baseURL: API_URL, // ✅ baseURL should be just the value
-  withCredentials: true,
+const api = axios.create({
+  baseURL: API_URL,  // e.g., https://college-connect-iufs.onrender.com
+  withCredentials: true
 });
 
 export default api;
