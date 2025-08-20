@@ -1,4 +1,4 @@
-# collegeconnect AI – AI-Powered Peer-to-Peer Doubt Solving Platform
+# College Connect AI – AI-Powered Peer-to-Peer Doubt Solving Platform
 
 ## 🎯 Problem Statement
 Many students in India, especially in Tier 2/3 cities, face challenges in getting timely and accurate answers to their academic doubts. Traditional tutoring is expensive, and online communities are often slow or unreliable. Existing platforms are cluttered with content from 1st to 12th grade, making it difficult for engineering students to find relevant solutions.
