@@ -16,8 +16,10 @@ College Connect AI is a **college-specific** web-based platform that allows stud
 - **AI + Peer Collaboration**: Combines AI assistance with peer expertise
 - **Customizable Software**: Colleges can modify features as per their needs
 - **Interactive, animated, and mobile-friendly UI**
-- **Tracks questions and answers for personalized learning**
+- **Answer others questions and earn points**
 - **20-word AI answer limit for quick consumption**
+- **Shine on the leaderboard with highest points among peers**
+- **User Profiles**: Track reputation, badges, and contribution history
 
 ## 🛠️ Tech Stack
 - **Frontend:** React (Vite), Tailwind CSS, Framer Motion
