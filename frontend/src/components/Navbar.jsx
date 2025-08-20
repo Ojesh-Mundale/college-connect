@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <nav className="bg-white shadow-lg sticky top-0 z-50">
@@ -37,7 +38,10 @@ const Navbar = () => {
                   Profile
                 </Link>
                 <button
-                  onClick={logout}
+                  onClick={() => {
+                    logout();
+                    navigate('/login');
+                  }}
                   className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition-colors"
                 >
                   Logout
@@ -119,6 +123,7 @@ const Navbar = () => {
                   onClick={() => {
                     logout();
                     setIsOpen(false);
+                    navigate('/login');
                   }}
                   className="block w-full text-left px-3 py-2 text-gray-700 hover:text-pink-600 hover:bg-gray-50 rounded-md transition-colors"
                 >
