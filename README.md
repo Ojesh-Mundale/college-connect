@@ -66,5 +66,5 @@ PORT=5000
 
 ## Created by 
 
-- **Ojesh Mundale ** - Third year CSE student
+- **Ojesh Mundale** - Third year CSE student
 
