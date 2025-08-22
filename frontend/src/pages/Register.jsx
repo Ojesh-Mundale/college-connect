@@ -115,7 +115,7 @@ const Register = () => {
             disabled={loading}
             className="w-full bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 disabled:opacity-50"
           >
-            {loading ? 'Creating Account..(this make take a while) if login fails please try again' : 'Register'}
+            {loading ? 'Creating Account..(this may take a while) if registration fails please try again' : 'Register'}
           </button>
         </form>
 
