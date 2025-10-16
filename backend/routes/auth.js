@@ -215,51 +215,56 @@ router.post('/google-signin', async (req, res) => {
   }
 });
 
-// Create user after email confirmation
-router.post('/create-after-confirm', async (req, res) => {
+// Handle email confirmation redirect
+router.get('/confirm', async (req, res) => {
   try {
-    const { access_token } = req.body;
     const supabase = req.app.get('supabase');
+    const { data, error } = await supabase.auth.getSession();
 
-    if (!access_token) {
-      return res.status(400).json({ message: 'Access token is required' });
+    if (error) {
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      return res.redirect(
+        `${frontendUrl}/confirm?status=error&message=${encodeURIComponent(error.message)}`
+      );
     }
 
-    const { data: { user }, error } = await supabase.auth.getUser(access_token);
-    if (error) {
-      return res.status(400).json({ message: error.message });
+    const supabaseUser = data?.session?.user;
+
+    if (!supabaseUser) {
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      return res.redirect(
+        `${frontendUrl}/confirm?status=error&message=No user found`
+      );
     }
 
     // Check if user exists in our DB
-    let dbUser = await User.findOne({ email: user.email });
+    let dbUser = await User.findOne({ email: supabaseUser.email });
 
     if (!dbUser) {
       // Create user if not exists
-      const { username, password } = user.user_metadata;
+      const { username, password } = supabaseUser.user_metadata;
       dbUser = new User({
-        username: username || user.email.split('@')[0],
-        email: user.email,
-        password: password || 'supabase-auth'
+        username: username || supabaseUser.email.split('@')[0],
+        email: supabaseUser.email,
+        password: password || 'magic-link'
       });
       await dbUser.save();
     }
 
-    // Generate JWT token
+    // Generate JWT token for our app
     const token = jwt.sign({ id: dbUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-    res.json({
-      token,
-      user: {
-        id: dbUser._id,
-        username: dbUser.username,
-        email: dbUser.email,
-        avatar: dbUser.avatar,
-        points: dbUser.points
-      }
-    });
-  } catch (error) {
-    console.error('Failed to create user after confirmation:', error);
-    res.status(500).json({ message: error.message });
+    // Redirect to frontend with token
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    return res.redirect(
+      `${frontendUrl}/confirm?status=success&token=${token}`
+    );
+  } catch (err) {
+    console.error('Confirmation error:', err);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(
+      `${frontendUrl}/confirm?status=error&message=${encodeURIComponent(err.message)}`
+    );
   }
 });
 

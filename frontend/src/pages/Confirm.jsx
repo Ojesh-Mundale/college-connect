@@ -1,56 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { createClient } from '@supabase/supabase-js';
 
 const Confirm = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { createAfterConfirm } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleConfirmation = async () => {
-      try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const accessToken = urlParams.get('access_token');
-        const refreshToken = urlParams.get('refresh_token');
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    const token = params.get('token');
+    const message = params.get('message');
 
-        if (!accessToken) {
-          setError('Invalid confirmation link');
-          setLoading(false);
-          return;
-        }
+    if (status === 'success' && token) {
+      // Save token to localStorage
+      localStorage.setItem('token', token);
 
-        // Set Supabase session first
-        const supabase = createClient(
-          import.meta.env.VITE_SUPABASE_URL,
-          import.meta.env.VITE_SUPABASE_ANON_KEY
-        );
-
-        const { error: sessionError } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken,
-        });
-
-        if (sessionError) {
-          console.error('Session error:', sessionError);
-          setError('Failed to set session');
-          setLoading(false);
-          return;
-        }
-
-        await createAfterConfirm(accessToken);
-        navigate('/dashboard');
-      } catch (err) {
-        console.error('Confirmation error:', err);
-        setError(err.response?.data?.message || 'Failed to confirm email');
+      // Redirect to dashboard
+      navigate('/dashboard');
+    } else if (status === 'error') {
+      setError(message || 'Confirmation failed');
+      setLoading(false);
+    } else {
+      // Show loading state
+      setTimeout(() => {
+        setError('Confirmation link sent to your email. Please check your inbox and click the link to complete registration.');
         setLoading(false);
-      }
-    };
-
-    handleConfirmation();
-  }, [createAfterConfirm, navigate]);
+      }, 2000);
+    }
+  }, [navigate]);
 
   if (loading) {
     return (

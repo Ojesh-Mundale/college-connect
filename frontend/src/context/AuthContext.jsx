@@ -62,14 +62,7 @@ export const AuthProvider = ({ children }) => {
     return { success: true };
   };
 
-  const createAfterConfirm = async (accessToken) => {
-    const response = await api.post('/api/auth/create-after-confirm', { access_token: accessToken });
-    const { token, user } = response.data;
-    localStorage.setItem('token', token);
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    setUser(user);
-    return { success: true };
-  };
+
 
   const googleSignIn = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -99,7 +92,6 @@ export const AuthProvider = ({ children }) => {
         login,
         sendConfirmation,
         confirmEmail,
-        createAfterConfirm,
         googleSignIn,
         logout,
         loading,
