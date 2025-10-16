@@ -11,7 +11,8 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  const [confirmationSent, setConfirmationSent] = useState(false);
+  const { sendConfirmation, confirmEmail, googleSignIn } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -21,9 +22,14 @@ const Register = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSendConfirmation = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
+      setError('Please fill in all fields');
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
@@ -33,12 +39,22 @@ const Register = () => {
     setLoading(true);
 
     try {
-      await register(formData.username, formData.email, formData.password);
-      navigate('/dashboard');
+      await sendConfirmation(formData.username, formData.email, formData.password);
+      setConfirmationSent(true);
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || 'Failed to send confirmation link');
     } finally {
       setLoading(false);
+    }
+  };
+
+
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await googleSignIn();
+    } catch (err) {
+      setError('Google sign in failed');
     }
   };
 
@@ -53,71 +69,94 @@ const Register = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Username
-            </label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-pink-500"
-              required
-            />
-          </div>
+        {!confirmationSent ? (
+          <form onSubmit={handleSendConfirmation}>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Username
+              </label>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-pink-500"
+                required
+              />
+            </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-pink-500"
-              required
-            />
-          </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-pink-500"
+                required
+              />
+            </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-pink-500"
-              required
-            />
-          </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-pink-500"
+                required
+              />
+            </div>
 
-          <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-pink-500"
-              required
-            />
-          </div>
+            <div className="mb-6">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-pink-500"
+                required
+              />
+            </div>
 
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 disabled:opacity-50"
+            >
+              {loading ? 'Sending Confirmation...' : 'Send Confirmation Link'}
+            </button>
+          </form>
+        ) : (
+          <div className="text-center">
+            <p className="text-green-600 mb-4">
+              Confirmation link sent to your email. Please check your inbox and click the link to complete registration.
+            </p>
+            <button
+              onClick={() => setConfirmationSent(false)}
+              className="text-pink-600 hover:underline"
+            >
+              Send again
+            </button>
+          </div>
+        )}
+
+        <div className="mt-4">
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 disabled:opacity-50"
+            onClick={handleGoogleSignIn}
+            className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 mb-2"
           >
-            {loading ? 'Creating Account..(this may take a while) if registration fails please try again' : 'Register'}
+            Sign in with Google
           </button>
-        </form>
+        </div>
 
         <p className="text-center mt-4">
           Already have an account?{' '}

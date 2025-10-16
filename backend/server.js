@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const http = require('http');
 const socketIo = require('socket.io');
+const { createClient } = require('@supabase/supabase-js');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -15,11 +16,16 @@ const userRoutes = require('./routes/users');
 
 dotenv.config();
 
+// Initialize Supabase client
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+
 const app = express();
 const server = http.createServer(app);
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:3000",
+  "http://localhost:3001",
   "https://college-connect-website.onrender.com"
 ];
 
@@ -82,8 +88,9 @@ io.on('connection', (socket) => {
   });
 });
 
-// Make io accessible in routes
+// Make io and supabase accessible in routes
 app.set('io', io);
+app.set('supabase', supabase);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

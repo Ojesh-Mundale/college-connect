@@ -7,7 +7,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, googleSignIn } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -71,6 +71,15 @@ const Login = () => {
             {loading ? 'Logging in..(this may take a while) if login fails please try again' : 'Login'}
           </button>
         </form>
+
+        <div className="mt-4">
+          <button
+            onClick={googleSignIn}
+            className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 mb-2"
+          >
+            Sign in with Google
+          </button>
+        </div>
 
         <p className="text-center mt-4">
           Don't have an account?{' '}
