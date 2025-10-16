@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 const Confirm = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { confirmEmail } = useAuth();
+  const { createAfterConfirm } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const Confirm = () => {
         }
 
         // Use the auth context method to confirm and login
-        await confirmEmail(accessToken, 'signup');
+        await createAfterConfirm(accessToken);
         navigate('/dashboard'); // redirect to dashboard
       } catch (err) {
         console.error('Magic link error:', err);
@@ -47,7 +47,7 @@ const Confirm = () => {
     }
 
     handleMagicLink();
-  }, [confirmEmail, navigate]);
+  }, [createAfterConfirm, navigate]);
 
   if (loading) {
     return (
