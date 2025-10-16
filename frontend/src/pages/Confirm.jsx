@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createClient } from '@supabase/supabase-js';
-import api from '../config/api';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+import { useAuth } from '../context/AuthContext';
 
 const Confirm = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const { confirmEmail } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,21 +36,9 @@ const Confirm = () => {
           return;
         }
 
-        // Call backend to verify token and create/login user
-        const res = await api.post('/api/auth/confirm-email', {
-          token: accessToken,
-          type: 'signup'
-        });
-
-        const result = res.data;
-
-        if (result.token) {
-          localStorage.setItem('token', result.token); // save your JWT
-          navigate('/dashboard'); // redirect to dashboard
-        } else {
-          setError('Failed to create account');
-          setLoading(false);
-        }
+        // Use the auth context method to confirm and login
+        await confirmEmail(accessToken, 'signup');
+        navigate('/dashboard'); // redirect to dashboard
       } catch (err) {
         console.error('Magic link error:', err);
         setError('Failed to confirm account');
@@ -64,7 +47,7 @@ const Confirm = () => {
     }
 
     handleMagicLink();
-  }, [navigate]);
+  }, [confirmEmail, navigate]);
 
   if (loading) {
     return (

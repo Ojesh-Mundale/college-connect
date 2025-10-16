@@ -120,44 +120,51 @@ router.post('/confirm-email', async (req, res) => {
     const { token, type } = req.body;
     const supabase = req.app.get('supabase');
 
+    if (!token) {
+      return res.status(400).json({ message: 'Token is required' });
+    }
+
     if (type !== 'signup') {
       return res.status(400).json({ message: 'Invalid confirmation type' });
     }
 
     const { data, error } = await supabase.auth.verifyOtp({
       token,
-      type: 'email',
+      type: 'magiclink',
     });
 
     if (error) {
       console.error('Supabase verify error:', error);
-      return res.status(400).json({ message: 'Invalid confirmation token' });
+      return res.status(400).json({ message: 'Invalid or expired confirmation token' });
     }
 
     const { user } = data;
     const { username, password } = user.user_metadata;
 
-    // Check if user exists
-    const existingUser = await User.findOne({ email: user.email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+    // Check if user exists in our DB
+    let dbUser = await User.findOne({ email: user.email });
+
+    if (!dbUser) {
+      // Create user if not exists
+      dbUser = new User({
+        username: username || user.email.split('@')[0],
+        email: user.email,
+        password: password || 'magic-link'
+      });
+      await dbUser.save();
     }
 
-    // Create user
-    const newUser = new User({ username, email: user.email, password });
-    await newUser.save();
-
-    // Generate token
-    const jwtToken = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    // Generate JWT token for our app
+    const jwtToken = jwt.sign({ id: dbUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
     res.status(201).json({
       token: jwtToken,
       user: {
-        id: newUser._id,
-        username: newUser.username,
-        email: newUser.email,
-        avatar: newUser.avatar,
-        points: newUser.points
+        id: dbUser._id,
+        username: dbUser.username,
+        email: dbUser.email,
+        avatar: dbUser.avatar,
+        points: dbUser.points
       }
     });
   } catch (error) {
