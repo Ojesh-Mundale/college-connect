@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Confirm from './pages/Confirm';
 import AskQuestion from './pages/AskQuestion';
 import QuestionDetail from './pages/QuestionDetail';
 import Profile from './pages/Profile';
@@ -23,6 +24,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/confirm" element={<Confirm />} />
               <Route path="/ask" element={<AskQuestion />} />
               <Route path="/question/:id" element={<QuestionDetail />} />
               <Route path="/profile" element={<Profile />} />
