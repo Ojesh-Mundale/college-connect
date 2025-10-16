@@ -11,11 +11,18 @@ const Confirm = () => {
   useEffect(() => {
     async function handleMagicLink() {
       try {
-        // Check for error parameters first
-        const params = new URLSearchParams(window.location.search);
-        const error = params.get('error');
-        const errorCode = params.get('error_code');
-        const errorDescription = params.get('error_description');
+        // Check for error parameters in query string
+        const searchParams = new URLSearchParams(window.location.search);
+        let error = searchParams.get('error');
+        let errorDescription = searchParams.get('error_description');
+
+        // Also check for error in hash (fragment)
+        if (!error) {
+          const hash = window.location.hash;
+          const hashParams = new URLSearchParams(hash.replace('#', '?'));
+          error = hashParams.get('error');
+          errorDescription = hashParams.get('error_description');
+        }
 
         if (error) {
           console.error('Magic link error:', errorDescription);
