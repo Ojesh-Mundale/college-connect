@@ -89,7 +89,7 @@ router.post('/send-confirmation', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://college-connect-website.onrender.com';
     const { data, error } = await supabase.auth.signInWithOtp({
       email,
       options: {
