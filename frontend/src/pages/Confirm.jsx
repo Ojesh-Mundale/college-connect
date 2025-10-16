@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { createClient } from '@supabase/supabase-js';
 
 const Confirm = () => {
   const [loading, setLoading] = useState(true);
@@ -13,9 +14,28 @@ const Confirm = () => {
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const accessToken = urlParams.get('access_token');
+        const refreshToken = urlParams.get('refresh_token');
 
         if (!accessToken) {
           setError('Invalid confirmation link');
+          setLoading(false);
+          return;
+        }
+
+        // Set Supabase session first
+        const supabase = createClient(
+          import.meta.env.VITE_SUPABASE_URL,
+          import.meta.env.VITE_SUPABASE_ANON_KEY
+        );
+
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          setError('Failed to set session');
           setLoading(false);
           return;
         }
