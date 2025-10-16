@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { createClient } from '@supabase/supabase-js';
+import api from '../config/api';
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 const Confirm = () => {
   const [loading, setLoading] = useState(true);
@@ -8,27 +14,61 @@ const Confirm = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const status = params.get('status');
-    const token = params.get('token');
-    const message = params.get('message');
+    async function handleMagicLink() {
+      try {
+        // Parse token from URL hash or query
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
 
-    if (status === 'success' && token) {
-      // Save token to localStorage
-      localStorage.setItem('token', token);
+        if (!token) {
+          console.error('No token found');
+          setError('Confirmation link sent to your email. Please check your inbox and click the link to complete registration.');
+          setLoading(false);
+          return;
+        }
 
-      // Redirect to dashboard
-      navigate('/dashboard');
-    } else if (status === 'error') {
-      setError(message || 'Confirmation failed');
-      setLoading(false);
-    } else {
-      // Show loading state
-      setTimeout(() => {
-        setError('Confirmation link sent to your email. Please check your inbox and click the link to complete registration.');
+        // Use Supabase to get session from magic link
+        const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
+
+        if (error) {
+          console.error('Supabase session error:', error.message);
+          setError('Failed to verify confirmation link');
+          setLoading(false);
+          return;
+        }
+
+        const user = data.session?.user;
+
+        if (!user) {
+          console.error('No user found');
+          setError('User not found in session');
+          setLoading(false);
+          return;
+        }
+
+        // Call backend to auto-create or login user
+        const res = await api.post('/api/auth/magic-login', {
+          email: user.email,
+          username: user.user_metadata.full_name || user.email.split('@')[0],
+        });
+
+        const result = res.data;
+
+        if (result.token) {
+          localStorage.setItem('token', result.token); // save your JWT
+          navigate('/dashboard'); // redirect to dashboard
+        } else {
+          setError('Failed to create account');
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Magic link error:', err);
+        setError('Failed to confirm account');
         setLoading(false);
-      }, 2000);
+      }
     }
+
+    handleMagicLink();
   }, [navigate]);
 
   if (loading) {

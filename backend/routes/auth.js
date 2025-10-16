@@ -215,56 +215,32 @@ router.post('/google-signin', async (req, res) => {
   }
 });
 
-// Handle email confirmation redirect
-router.get('/confirm', async (req, res) => {
+// Magic login route for auto-login after magic link
+router.post('/magic-login', async (req, res) => {
   try {
-    const supabase = req.app.get('supabase');
-    const { data, error } = await supabase.auth.getSession();
+    const { email, username } = req.body;
 
-    if (error) {
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-      return res.redirect(
-        `${frontendUrl}/confirm?status=error&message=${encodeURIComponent(error.message)}`
-      );
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = new User({ email, username, password: 'magiclink-login' });
+      await user.save();
     }
 
-    const supabaseUser = data?.session?.user;
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-    if (!supabaseUser) {
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-      return res.redirect(
-        `${frontendUrl}/confirm?status=error&message=No user found`
-      );
-    }
-
-    // Check if user exists in our DB
-    let dbUser = await User.findOne({ email: supabaseUser.email });
-
-    if (!dbUser) {
-      // Create user if not exists
-      const { username, password } = supabaseUser.user_metadata;
-      dbUser = new User({
-        username: username || supabaseUser.email.split('@')[0],
-        email: supabaseUser.email,
-        password: password || 'magic-link'
-      });
-      await dbUser.save();
-    }
-
-    // Generate JWT token for our app
-    const token = jwt.sign({ id: dbUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-    // Redirect to frontend with token
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    return res.redirect(
-      `${frontendUrl}/confirm?status=success&token=${token}`
-    );
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
+        points: user.points,
+      },
+    });
   } catch (err) {
-    console.error('Confirmation error:', err);
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    res.redirect(
-      `${frontendUrl}/confirm?status=error&message=${encodeURIComponent(err.message)}`
-    );
+    res.status(500).json({ message: err.message });
   }
 });
 
