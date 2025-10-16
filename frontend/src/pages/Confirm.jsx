@@ -29,39 +29,22 @@ const Confirm = () => {
           return;
         }
 
-        // Parse token from URL hash or query
-        const token = params.get('token') || params.get('access_token');
+        // Extract access_token from URL hash (fragment)
+        const hash = window.location.hash; // "#access_token=...&type=magiclink"
+        const hashParams = new URLSearchParams(hash.replace('#', '?'));
+        const accessToken = hashParams.get('access_token');
 
-        if (!token) {
-          console.error('No token found');
+        if (!accessToken) {
+          console.error('No access token found');
           setError('Confirmation link sent to your email. Please check your inbox and click the link to complete registration.');
           setLoading(false);
           return;
         }
 
-        // Use Supabase to get session from magic link
-        const { data, error: sessionError } = await supabase.auth.getSessionFromUrl({ storeSession: true });
-
-        if (sessionError) {
-          console.error('Supabase session error:', sessionError.message);
-          setError('Failed to verify confirmation link');
-          setLoading(false);
-          return;
-        }
-
-        const user = data.session?.user;
-
-        if (!user) {
-          console.error('No user found');
-          setError('User not found in session');
-          setLoading(false);
-          return;
-        }
-
-        // Call backend to auto-create or login user
-        const res = await api.post('/api/auth/magic-login', {
-          email: user.email,
-          username: user.user_metadata.full_name || user.email.split('@')[0],
+        // Call backend to verify token and create/login user
+        const res = await api.post('/api/auth/confirm-email', {
+          token: accessToken,
+          type: 'signup'
         });
 
         const result = res.data;

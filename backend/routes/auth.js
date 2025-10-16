@@ -215,34 +215,7 @@ router.post('/google-signin', async (req, res) => {
   }
 });
 
-// Magic login route for auto-login after magic link
-router.post('/magic-login', async (req, res) => {
-  try {
-    const { email, username } = req.body;
 
-    let user = await User.findOne({ email });
-
-    if (!user) {
-      user = new User({ email, username, password: 'magiclink-login' });
-      await user.save();
-    }
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-    res.json({
-      token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        avatar: user.avatar,
-        points: user.points,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
 
 // Get current user
 router.get('/me', auth, async (req, res) => {
