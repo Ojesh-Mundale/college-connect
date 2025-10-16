@@ -16,9 +16,21 @@ const Confirm = () => {
   useEffect(() => {
     async function handleMagicLink() {
       try {
-        // Parse token from URL hash or query
+        // Check for error parameters first
         const params = new URLSearchParams(window.location.search);
-        const token = params.get('token');
+        const error = params.get('error');
+        const errorCode = params.get('error_code');
+        const errorDescription = params.get('error_description');
+
+        if (error) {
+          console.error('Magic link error:', errorDescription);
+          setError(`Link expired or invalid. Please try registering again.`);
+          setLoading(false);
+          return;
+        }
+
+        // Parse token from URL hash or query
+        const token = params.get('token') || params.get('access_token');
 
         if (!token) {
           console.error('No token found');
@@ -28,10 +40,10 @@ const Confirm = () => {
         }
 
         // Use Supabase to get session from magic link
-        const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
+        const { data, error: sessionError } = await supabase.auth.getSessionFromUrl({ storeSession: true });
 
-        if (error) {
-          console.error('Supabase session error:', error.message);
+        if (sessionError) {
+          console.error('Supabase session error:', sessionError.message);
           setError('Failed to verify confirmation link');
           setLoading(false);
           return;

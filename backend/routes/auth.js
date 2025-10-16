@@ -89,11 +89,11 @@ router.post('/send-confirmation', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    const origin = req.headers.origin || req.headers.referer?.split('/').slice(0, 3).join('/') || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     const { data, error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${origin}/confirm`,
+        emailRedirectTo: `${frontendUrl}/confirm`,
         data: {
           username,
           password, // In production, hash this or use a secure method
