@@ -45,7 +45,7 @@ const Confirm = () => {
 
         // Use the auth context method to confirm and login
         await createAfterConfirm(accessToken);
-        window.location.href = '/dashboard'; // force reload to dashboard
+        setLoading(false);
       } catch (err) {
         console.error('Magic link error:', err);
         setError('Failed to confirm account');
