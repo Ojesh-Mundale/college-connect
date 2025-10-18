@@ -24,6 +24,32 @@ export const AuthProvider = ({ children }) => {
     } else {
       setLoading(false);
     }
+
+    // Listen for localStorage changes to handle cross-tab login
+    const handleStorageChange = (e) => {
+      if (e.key === 'token') {
+        if (e.newValue) {
+          api.defaults.headers.common['Authorization'] = `Bearer ${e.newValue}`;
+          fetchUser();
+        } else {
+          setUser(null);
+        }
+      }
+    };
+
+    // BroadcastChannel for cross-tab reload on login
+    const channel = new BroadcastChannel('auth-channel');
+    channel.onmessage = (event) => {
+      if (event.data.type === 'login') {
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      channel.close();
+    };
   }, []);
 
   const fetchUser = async () => {
@@ -68,6 +94,10 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', token);
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     setUser(user);
+    // Broadcast login event to other tabs
+    const channel = new BroadcastChannel('auth-channel');
+    channel.postMessage({ type: 'login' });
+    channel.close();
     return { success: true };
   };
 

@@ -45,7 +45,7 @@ const Confirm = () => {
 
         // Use the auth context method to confirm and login
         await createAfterConfirm(accessToken);
-        navigate('/dashboard'); // redirect to dashboard
+        window.location.href = '/dashboard'; // force reload to dashboard
       } catch (err) {
         console.error('Magic link error:', err);
         setError('Failed to confirm account');
@@ -89,7 +89,25 @@ const Confirm = () => {
     );
   }
 
-  return null;
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
+        <div className="text-green-600 mb-4">
+          <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Account Verified!</h2>
+        <p className="text-gray-600 mb-6">Your account has been verified from any device. You are now logged in.</p>
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="bg-pink-600 text-white py-2 px-4 rounded-lg hover:bg-pink-700"
+        >
+          Go to Dashboard
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default Confirm;
