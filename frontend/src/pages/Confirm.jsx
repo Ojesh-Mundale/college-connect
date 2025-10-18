@@ -98,12 +98,13 @@ const Confirm = () => {
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Account Verified!</h2>
-        <p className="text-gray-600 mb-6">Your account has been verified from any device. You are now logged in.</p>
+        <p className="text-gray-600 mb-6">Your account has been verified. Please login to continue.</p>
+        <p className="text-sm text-gray-500 mb-4">Website: https://college-connect-website.onrender.com</p>
         <button
-          onClick={() => navigate('/dashboard')}
+          onClick={() => window.location.href = 'https://college-connect-website.onrender.com/login'}
           className="bg-pink-600 text-white py-2 px-4 rounded-lg hover:bg-pink-700"
         >
-          Go to Dashboard
+          Go to Login
         </button>
       </div>
     </div>
