@@ -9,15 +9,21 @@ const Confirm = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let isMounted = true;
+
     const handleAuthStateChange = async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+      if (event === 'SIGNED_IN' && session && isMounted) {
         try {
           await createAfterConfirm(session.access_token);
-          setLoading(false);
+          if (isMounted) {
+            setLoading(false);
+          }
         } catch (err) {
           console.error('Failed to create user after confirmation:', err);
-          setError('Failed to confirm account');
-          setLoading(false);
+          if (isMounted) {
+            setError('Failed to confirm account');
+            setLoading(false);
+          }
         }
       }
     };
@@ -27,16 +33,20 @@ const Confirm = () => {
 
     // Check current session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session) {
+      if (session && isMounted) {
         try {
           await createAfterConfirm(session.access_token);
-          setLoading(false);
+          if (isMounted) {
+            setLoading(false);
+          }
         } catch (err) {
           console.error('Failed to create user after confirmation:', err);
-          setError('Failed to confirm account');
-          setLoading(false);
+          if (isMounted) {
+            setError('Failed to confirm account');
+            setLoading(false);
+          }
         }
-      } else {
+      } else if (isMounted) {
         // Check for error parameters
         const searchParams = new URLSearchParams(window.location.search);
         let error = searchParams.get('error');
@@ -59,7 +69,10 @@ const Confirm = () => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, [createAfterConfirm, supabase.auth]);
 
   if (loading) {
