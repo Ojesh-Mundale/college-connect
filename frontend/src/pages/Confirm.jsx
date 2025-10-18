@@ -5,18 +5,43 @@ import { useAuth } from '../context/AuthContext';
 const Confirm = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { createAfterConfirm } = useAuth();
+  const { createAfterConfirm, supabase } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function handleMagicLink() {
-      try {
-        // Check for error parameters in query string
+    const handleAuthStateChange = async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        try {
+          await createAfterConfirm(session.access_token);
+          setLoading(false);
+        } catch (err) {
+          console.error('Failed to create user after confirmation:', err);
+          setError('Failed to confirm account');
+          setLoading(false);
+        }
+      }
+    };
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
+
+    // Check current session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session) {
+        try {
+          await createAfterConfirm(session.access_token);
+          setLoading(false);
+        } catch (err) {
+          console.error('Failed to create user after confirmation:', err);
+          setError('Failed to confirm account');
+          setLoading(false);
+        }
+      } else {
+        // Check for error parameters
         const searchParams = new URLSearchParams(window.location.search);
         let error = searchParams.get('error');
         let errorDescription = searchParams.get('error_description');
 
-        // Also check for error in hash (fragment)
         if (!error) {
           const hash = window.location.hash;
           const hashParams = new URLSearchParams(hash.replace('#', '?'));
@@ -27,34 +52,15 @@ const Confirm = () => {
         if (error) {
           console.error('Magic link error:', errorDescription);
           setError(`Link expired or invalid. Please try registering again.`);
-          setLoading(false);
-          return;
-        }
-
-        // Extract access_token from URL hash (fragment)
-        const hash = window.location.hash; // "#access_token=...&type=magiclink"
-        const hashParams = new URLSearchParams(hash.replace('#', '?'));
-        const accessToken = hashParams.get('access_token');
-
-        if (!accessToken) {
-          console.error('No access token found');
+        } else {
           setError('Confirmation link sent to your email. Please check your inbox and click the link to complete registration.');
-          setLoading(false);
-          return;
         }
-
-        // Use the auth context method to confirm and login
-        await createAfterConfirm(accessToken);
-        setLoading(false);
-      } catch (err) {
-        console.error('Magic link error:', err);
-        setError('Failed to confirm account');
         setLoading(false);
       }
-    }
+    });
 
-    handleMagicLink();
-  }, [createAfterConfirm, navigate]);
+    return () => subscription.unsubscribe();
+  }, [createAfterConfirm, supabase.auth]);
 
   if (loading) {
     return (
