@@ -94,10 +94,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', token);
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     setUser(user);
-    // Broadcast login event to other tabs
-    const channel = new BroadcastChannel('auth-channel');
-    channel.postMessage({ type: 'login' });
-    channel.close();
+    // Do not broadcast login event to avoid redirect loop
     return { success: true };
   };
 
