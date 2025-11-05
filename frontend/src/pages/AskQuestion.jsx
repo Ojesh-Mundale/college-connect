@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../config/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -42,9 +42,32 @@ const AskQuestion = () => {
 
   if (!user) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold mb-4">Please login to ask a question</h2>
-        <p className="text-gray-600">Only logged-in engineering students can post questions.</p>
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-8 text-white">
+            <h1 className="text-4xl font-bold mb-4">Ask Your Engineering Questions!</h1>
+            <p className="text-xl mb-6">
+              Get expert answers from fellow engineering students and build your knowledge together!
+            </p>
+            <p className="text-lg mb-8">
+              Join our community to ask questions, share knowledge, and earn points.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/login"
+                className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+              >
+                Log In
+              </Link>
+              <Link
+                to="/register"
+                className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+              >
+                Sign Up
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
