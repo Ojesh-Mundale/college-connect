@@ -43,7 +43,7 @@ const Leaderboard = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto text-center">
           <div className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg p-8 text-white">
-            <h1 className="text-4xl font-bold mb-4">🏆 Unlock the Leaderboard!</h1>
+            <h1 className="text-4xl font-bold mb-4">Unlock the Leaderboard!🏆</h1>
             <p className="text-xl mb-6">
               Join the competition and see how you stack up against other contributors!
             </p>
