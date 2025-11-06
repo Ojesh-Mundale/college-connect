@@ -5,9 +5,9 @@ import api from '../config/api';
 import DeleteQuestionButton from '../components/DeleteQuestionButton';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [questions, setQuestions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [questionsLoading, setQuestionsLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [categories, setCategories] = useState({});
@@ -19,13 +19,15 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    if (!user) {
+    if (!user && !loading) {
       // Redirect to login if not authenticated
       window.location.href = '/login';
       return;
     }
-    fetchQuestions();
-  }, [filter, user, searchTerm]);
+    if (user) {
+      fetchQuestions();
+    }
+  }, [filter, user, searchTerm, loading]);
 
   const fetchQuestions = async () => {
     try {

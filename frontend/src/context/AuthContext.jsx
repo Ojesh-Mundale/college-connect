@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
           console.error('Error during Google sign-in:', error);
         }
-      } else if (event === 'SIGNED_OUT') {
+      }
         logout();
       }
     });
@@ -126,9 +126,6 @@ export const AuthProvider = ({ children }) => {
   const googleSignIn = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`,
-      },
     });
 
     if (error) {
