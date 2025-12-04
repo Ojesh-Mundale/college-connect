@@ -12,7 +12,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
-  const { sendConfirmation, confirmEmail, googleSignIn } = useAuth();
+  // const { sendConfirmation, confirmEmail, googleSignIn } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -50,13 +50,13 @@ const Register = () => {
 
 
 
-  const handleGoogleSignIn = async () => {
-    try {
-      await googleSignIn();
-    } catch (err) {
-      setError('Google sign in failed');
-    }
-  };
+  // const handleGoogleSignIn = async () => {
+  //   try {
+  //     await googleSignIn();
+  //   } catch (err) {
+  //     setError('Google sign in failed');
+  //   }
+  // };
 
   return (
     <div className="max-w-md mx-auto">
@@ -148,7 +148,7 @@ const Register = () => {
             </button>
           </div>
         )}
-
+{/* 
         <div className="mt-4">
           <button
             onClick={handleGoogleSignIn}
@@ -156,7 +156,7 @@ const Register = () => {
           >
             Sign in with Google
           </button>
-        </div>
+        </div> */}
 
         <p className="text-center mt-4">
           Already have an account?{' '}

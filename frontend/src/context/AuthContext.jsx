@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
       }
         logout();
       }
-    });
+    );
 
     // Listen for localStorage changes to handle cross-tab login
     const handleStorageChange = (e) => {
