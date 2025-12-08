@@ -25,28 +25,6 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
 
-    // Listen for Supabase auth state changes (for OAuth like Google)
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        try {
-          // Use the access token from the session for OAuth authentication
-          const response = await api.post('/api/auth/create-after-confirm', { access_token: session.access_token });
-          const { token, user } = response.data;
-          localStorage.setItem('token', token);
-          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          setUser(user);
-          // Navigate to dashboard if not already there
-          if (window.location.pathname !== '/dashboard') {
-            window.location.href = '/dashboard';
-          }
-        } catch (error) {
-          console.error('Error during Google sign-in:', error);
-        }
-      }
-        logout();
-      }
-    );
-
     // Listen for localStorage changes to handle cross-tab login
     const handleStorageChange = (e) => {
       if (e.key === 'token') {
@@ -69,7 +47,6 @@ export const AuthProvider = ({ children }) => {
 
     window.addEventListener('storage', handleStorageChange);
     return () => {
-      authListener.subscription.unsubscribe();
       window.removeEventListener('storage', handleStorageChange);
       channel.close();
     };
@@ -123,17 +100,7 @@ export const AuthProvider = ({ children }) => {
 
 
 
-  const googleSignIn = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    });
 
-    if (error) {
-      throw error;
-    }
-
-    return data;
-  };
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -148,8 +115,6 @@ export const AuthProvider = ({ children }) => {
         login,
         sendConfirmation,
         confirmEmail,
-        createAfterConfirm,
-        googleSignIn,
         logout,
         loading,
         supabase

@@ -12,7 +12,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
-  const { sendConfirmation, confirmEmail, googleSignIn } = useAuth();
+  const { sendConfirmation, confirmEmail } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -148,15 +148,7 @@ const Register = () => {
             </button>
           </div>
         )}
-{/* 
-        <div className="mt-4">
-          <button
-            onClick={handleGoogleSignIn}
-            className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 mb-2"
-          >
-            Sign in with Google
-          </button>
-        </div> */}
+
 
         <p className="text-center mt-4">
           Already have an account?{' '}

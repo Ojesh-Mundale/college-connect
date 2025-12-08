@@ -173,104 +173,11 @@ router.post('/confirm-email', async (req, res) => {
   }
 });
 
-// Google Sign In
-router.post('/google-signin', async (req, res) => {
-  try {
-    const { idToken } = req.body;
-    const supabase = req.app.get('supabase');
-
-    const { data, error } = await supabase.auth.signInWithIdToken({
-      provider: 'google',
-      token: idToken,
-    });
-
-    if (error) {
-      return res.status(400).json({ message: error.message });
-    }
-
-    const { user } = data;
-
-    // Check if user exists in our DB
-    let dbUser = await User.findOne({ email: user.email });
-
-    if (!dbUser) {
-      // Create user if not exists
-      dbUser = new User({
-        username: user.user_metadata.full_name || user.email.split('@')[0],
-        email: user.email,
-        password: 'google-auth', // Placeholder, not used for Google auth
-        avatar: user.user_metadata.avatar_url || `https://ui-avatars.com/api/?background=random&name=${user.user_metadata.full_name || user.email}`,
-      });
-      await dbUser.save();
-    }
-
-    // Generate token
-    const token = jwt.sign({ id: dbUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-    res.json({
-      token,
-      user: {
-        id: dbUser._id,
-        username: dbUser.username,
-        email: dbUser.email,
-        avatar: dbUser.avatar,
-        points: dbUser.points
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
 
 
 
-// Create user after email confirmation
-router.post('/create-after-confirm', async (req, res) => {
-  try {
-    const { access_token } = req.body;
-    const supabase = req.app.get('supabase');
 
-    if (!access_token) {
-      return res.status(400).json({ message: 'Access token is required' });
-    }
 
-    const { data: { user }, error } = await supabase.auth.getUser(access_token);
-    if (error) {
-      return res.status(400).json({ message: error.message });
-    }
-
-    // Check if user exists in our DB
-    let dbUser = await User.findOne({ email: user.email });
-
-    if (!dbUser) {
-      // Create user if not exists
-      const { username, password } = user.user_metadata;
-      dbUser = new User({
-        username: username || user.email.split('@')[0],
-        email: user.email,
-        password: password || 'supabase-auth'
-      });
-      await dbUser.save();
-    }
-
-    // Generate JWT token
-    const token = jwt.sign({ id: dbUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-    res.json({
-      token,
-      user: {
-        id: dbUser._id,
-        username: dbUser.username,
-        email: dbUser.email,
-        avatar: dbUser.avatar,
-        points: dbUser.points
-      }
-    });
-  } catch (error) {
-    console.error('Failed to create user after confirmation:', error);
-    res.status(500).json({ message: error.message });
-  }
-});
 
 // Get current user
 router.get('/me', auth, async (req, res) => {
