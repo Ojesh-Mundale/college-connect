@@ -12,7 +12,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
-  // const { sendConfirmation, confirmEmail, googleSignIn } = useAuth();
+  const { sendConfirmation, confirmEmail, googleSignIn } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
