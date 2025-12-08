@@ -179,6 +179,58 @@ router.post('/confirm-email', async (req, res) => {
 
 
 
+// Create user after confirmation
+router.post('/create-after-confirm', async (req, res) => {
+  try {
+    const { access_token } = req.body;
+    const supabase = req.app.get('supabase');
+
+    if (!access_token) {
+      return res.status(400).json({ message: 'Access token is required' });
+    }
+
+    // Verify the access token with Supabase
+    const { data: { user }, error } = await supabase.auth.getUser(access_token);
+
+    if (error || !user) {
+      console.error('Supabase getUser error:', error);
+      return res.status(400).json({ message: 'Invalid access token' });
+    }
+
+    const { username, password } = user.user_metadata;
+
+    // Check if user already exists in our DB
+    let dbUser = await User.findOne({ email: user.email });
+
+    if (!dbUser) {
+      // Create user if not exists
+      dbUser = new User({
+        username: username || user.email.split('@')[0],
+        email: user.email,
+        password: password || 'magic-link'
+      });
+      await dbUser.save();
+    }
+
+    // Generate JWT token for our app
+    const jwtToken = jwt.sign({ id: dbUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    res.status(201).json({
+      token: jwtToken,
+      user: {
+        id: dbUser._id,
+        username: dbUser.username,
+        email: dbUser.email,
+        avatar: dbUser.avatar,
+        points: dbUser.points
+      }
+    });
+  } catch (error) {
+    console.error('Failed to create user after confirmation:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get current user
 router.get('/me', auth, async (req, res) => {
   try {
