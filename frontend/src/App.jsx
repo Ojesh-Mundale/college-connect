@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import NavigationHandler from './components/NavigationHandler';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -15,8 +16,9 @@ import Leaderboard from './pages/Leaderboard';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
+        <NavigationHandler />
         <div className="min-h-screen bg-gray-50">
           <Navbar />
           <main className="container mx-auto px-4 py-4 sm:py-6 md:py-8">
@@ -34,8 +36,8 @@ function App() {
           </main>
           <Footer />
         </div>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

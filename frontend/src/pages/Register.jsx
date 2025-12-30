@@ -12,7 +12,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
-  const { sendConfirmation, confirmEmail } = useAuth();
+  const { sendConfirmation, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -50,13 +50,16 @@ const Register = () => {
 
 
 
-  // const handleGoogleSignIn = async () => {
-  //   try {
-  //     await googleSignIn();
-  //   } catch (err) {
-  //     setError('Google sign in failed');
-  //   }
-  // };
+  const handleGoogleSignIn = async () => {
+  setError('');
+  try {
+    await googleLogin();
+    // Google will redirect → AuthContext handles JWT
+  } catch (err) {
+    setError('Google sign in failed');
+  }
+};
+
 
   return (
     <div className="max-w-md mx-auto">
@@ -148,6 +151,26 @@ const Register = () => {
             </button>
           </div>
         )}
+{/* Divider */}
+<div className="flex items-center my-6">
+  <div className="flex-grow border-t"></div>
+  <span className="mx-4 text-gray-500 text-sm">OR</span>
+  <div className="flex-grow border-t"></div>
+</div>
+
+{/* Google Sign In */}
+<button
+  type="button"
+  onClick={handleGoogleSignIn}
+  className="w-full flex items-center justify-center border border-gray-300 py-2 rounded-lg hover:bg-gray-100"
+>
+  <img
+    src="https://developers.google.com/identity/images/g-logo.png"
+    alt="Google"
+    className="w-5 h-5 mr-2"
+  />
+  Continue with Google
+</button>
 
 
         <p className="text-center mt-4">

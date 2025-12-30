@@ -19,19 +19,23 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
+    console.log('📊 Dashboard useEffect:', { user: !!user, loading, filter, searchTerm });
+
     if (!user && !loading) {
-      // Redirect to login if not authenticated
+      console.log('🚫 Dashboard: No user and not loading, redirecting to login');
+      // Use React Router navigation instead of window.location.href
       window.location.href = '/login';
       return;
     }
     if (user) {
+      console.log('✅ Dashboard: User found, fetching questions');
       fetchQuestions();
     }
   }, [filter, user, searchTerm, loading]);
 
   const fetchQuestions = async () => {
     try {
-      setLoading(true);
+      setQuestionsLoading(true);
       let url = '/api/questions';
       
       if (filter === 'my' && user) {
