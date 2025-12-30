@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'https://ui-avatars.com/api/?background=random&name=User'
   },
+  customAvatarSeed: {
+    type: String,
+    default: null
+  },
   points: {
     type: Number,
     default: 50

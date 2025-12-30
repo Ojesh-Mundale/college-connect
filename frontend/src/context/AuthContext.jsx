@@ -125,6 +125,10 @@ export const AuthProvider = ({ children }) => {
     supabase.auth.signOut();
   };
 
+  const updateUser = (newUser) => {
+    setUser(newUser);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -132,6 +136,7 @@ export const AuthProvider = ({ children }) => {
         login,
         googleLogin,
         logout,
+        updateUser,
         loading
       }}
     >

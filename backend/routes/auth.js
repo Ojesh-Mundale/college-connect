@@ -28,6 +28,7 @@ router.post('/login', async (req, res) => {
         username: user.username,
         email: user.email,
         avatar: user.avatar,
+        customAvatarSeed: user.customAvatarSeed,
         points: user.points
       }
     });

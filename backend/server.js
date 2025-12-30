@@ -18,10 +18,18 @@ dotenv.config();
 
 /* ================= SUPABASE CLIENT (IMPORTANT) ================= */
 // ✅ MUST use SERVICE ROLE KEY on backend
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error('❌ Missing Supabase environment variables:');
+  console.error('   - SUPABASE_URL:', supabaseUrl ? '✅ Set' : '❌ Missing');
+  console.error('   - SUPABASE_SERVICE_ROLE_KEY:', supabaseServiceKey ? '✅ Set' : '❌ Missing');
+  console.error('Please set these environment variables in your deployment platform (Render).');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 /* ================= APP & SERVER ================= */
 const app = express();

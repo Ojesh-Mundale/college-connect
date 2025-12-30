@@ -143,10 +143,9 @@ const QuestionDetail = () => {
         
         <div className="flex items-center justify-between text-sm text-gray-500 border-t pt-4">
           <div className="flex items-center space-x-2">
-            <img 
-              src={question.author?.avatar || '/default-avatar.png'} 
-              alt={question.author?.username || 'User'}
-              className="w-8 h-8 rounded-full"
+            <Avatar
+              user={question.author}
+              size={32}
             />
             <span>By: {question.author?.username || 'Anonymous'}</span>
           </div>
@@ -223,10 +222,9 @@ const QuestionDetail = () => {
                 <p className="text-gray-700 mb-3 whitespace-pre-wrap">{answer.content}</p>
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <div className="flex items-center space-x-2">
-                    <img 
-                      src={answer.author?.avatar || '/default-avatar.png'} 
-                      alt={answer.author?.username || 'User'}
-                      className="w-6 h-6 rounded-full"
+                    <Avatar
+                      user={answer.author}
+                      size={24}
                     />
                     <span>{answer.author?.username || 'Anonymous'}</span>
                     {answer.author?.points && (

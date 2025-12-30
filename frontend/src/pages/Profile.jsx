@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
+import Avatar from '../components/Avatar';
 
 const Profile = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentAvatarSeed, setCurrentAvatarSeed] = useState(user?.customAvatarSeed || null);
+  const [savingAvatar, setSavingAvatar] = useState(false);
 
   // Function to get initials from name or email
   const getInitials = (name, email) => {
@@ -36,6 +39,10 @@ const Profile = () => {
       }
     }
   };
+
+  useEffect(() => {
+    setCurrentAvatarSeed(user?.customAvatarSeed || null);
+  }, [user?.customAvatarSeed]);
 
   useEffect(() => {
     const fetchUserQuestions = async () => {
@@ -89,6 +96,25 @@ const Profile = () => {
     );
   }
 
+  const handleSaveAvatar = async () => {
+    if (!currentAvatarSeed) return;
+
+    setSavingAvatar(true);
+    try {
+      const response = await api.put('/api/users/avatar-seed', {
+        customAvatarSeed: currentAvatarSeed
+      });
+
+      updateUser({ customAvatarSeed: currentAvatarSeed });
+      alert('Avatar saved successfully!');
+    } catch (error) {
+      console.error('Error saving avatar:', error);
+      alert('Failed to save avatar. Please try again.');
+    } finally {
+      setSavingAvatar(false);
+    }
+  };
+
   if (loading) {
     return <div className="text-center py-12">Loading...</div>;
   }
@@ -97,14 +123,28 @@ const Profile = () => {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
         <div className="flex items-center space-x-4">
-          <div className="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-            {getInitials(user.name)}
-          </div>
+          <Avatar
+            user={user}
+            size={80}
+            showRefresh={true}
+            onRefresh={(newSeed) => setCurrentAvatarSeed(newSeed)}
+          />
           <div>
             <h1 className="text-2xl font-bold">{user.name}</h1>
             <p className="text-gray-600">{user.email}</p>
           </div>
         </div>
+        {currentAvatarSeed !== (user?.customAvatarSeed || null) && (
+          <div className="mt-4">
+            <button
+              onClick={handleSaveAvatar}
+              disabled={savingAvatar}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {savingAvatar ? 'Saving...' : 'Save Avatar'}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-md">

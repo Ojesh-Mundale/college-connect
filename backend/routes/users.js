@@ -8,9 +8,9 @@ const router = express.Router();
 router.get('/leaderboard', async (req, res) => {
   try {
     const { limit = 50 } = req.query;
-    
+
     const users = await User.find({})
-      .select('username avatar points createdAt')
+      .select('username avatar customAvatarSeed points createdAt')
       .sort({ points: -1, createdAt: 1 })
       .limit(parseInt(limit));
 
@@ -20,6 +20,7 @@ router.get('/leaderboard', async (req, res) => {
       id: user._id,
       username: user.username,
       avatar: user.avatar,
+      customAvatarSeed: user.customAvatarSeed,
       points: user.points,
       createdAt: user.createdAt
     }));
@@ -33,19 +34,19 @@ router.get('/leaderboard', async (req, res) => {
 // Get current user's rank
 router.get('/rank', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('username avatar points');
-    
+    const user = await User.findById(req.user._id).select('username avatar customAvatarSeed points');
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
     // Count users with more points
     const usersAbove = await User.countDocuments({ points: { $gt: user.points } });
-    
+
     // Count users with same points but created earlier
-    const usersWithSamePoints = await User.countDocuments({ 
-      points: user.points, 
-      createdAt: { $lt: user.createdAt } 
+    const usersWithSamePoints = await User.countDocuments({
+      points: user.points,
+      createdAt: { $lt: user.createdAt }
     });
 
     const rank = usersAbove + usersWithSamePoints + 1;
@@ -55,9 +56,40 @@ router.get('/rank', auth, async (req, res) => {
         id: user._id,
         username: user.username,
         avatar: user.avatar,
+        customAvatarSeed: user.customAvatarSeed,
         points: user.points
       },
       rank
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Update user avatar seed
+router.put('/avatar-seed', auth, async (req, res) => {
+  try {
+    const { customAvatarSeed } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { customAvatarSeed },
+      { new: true }
+    ).select('username email avatar customAvatarSeed points');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
+        customAvatarSeed: user.customAvatarSeed,
+        points: user.points
+      }
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

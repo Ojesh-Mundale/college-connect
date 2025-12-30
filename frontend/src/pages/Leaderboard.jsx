@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import api from '../config/api';
+import Avatar from '../components/Avatar';
 
 const Leaderboard = () => {
   const { user } = useAuth();
@@ -112,10 +113,9 @@ const Leaderboard = () => {
                     {getRankBadge(userData.rank)}
                   </div>
 
-                  <img
-                    src={userData.avatar}
-                    alt={userData.username}
-                    className="w-12 h-12 rounded-full object-cover"
+                  <Avatar
+                    user={userData}
+                    size={48}
                   />
 
                   <div>
