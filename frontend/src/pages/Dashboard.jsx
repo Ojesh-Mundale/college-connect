@@ -3,6 +3,19 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
 import DeleteQuestionButton from '../components/DeleteQuestionButton';
+import { 
+  LayoutDashboard, 
+  Award, 
+  CheckCircle, 
+  Clock, 
+  Eye, 
+  ThumbsUp, 
+  MessageSquare,
+  Filter,
+  Search,
+  Sparkles,
+  TrendingUp
+} from 'lucide-react';
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
@@ -23,7 +36,6 @@ const Dashboard = () => {
 
     if (!user && !loading) {
       console.log('🚫 Dashboard: No user and not loading, redirecting to login');
-      // Use React Router navigation instead of window.location.href
       window.location.href = '/login';
       return;
     }
@@ -49,7 +61,6 @@ const Dashboard = () => {
       
       setQuestions(questionsData);
       
-      // Update stats based on current filter
       const resolvedCount = questionsData.filter(q => q.isResolved).length;
       const pendingCount = questionsData.filter(q => !q.answers?.length).length;
       
@@ -60,7 +71,6 @@ const Dashboard = () => {
         pendingAnswers: pendingCount
       });
       
-      // Count questions by category
       const counts = {};
       questionsData.forEach(q => {
         counts[q.subject] = (counts[q.subject] || 0) + 1;
@@ -70,7 +80,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error fetching questions:', error);
     } finally {
-      setLoading(false);
+      setQuestionsLoading(false);
     }
   };
 
@@ -106,9 +116,9 @@ const Dashboard = () => {
   };
 
   const getStatusColor = (question) => {
-    if (question.isResolved) return 'text-green-600';
-    if (question.answers?.length > 0) return 'text-blue-600';
-    return 'text-gray-600';
+    if (question.isResolved) return 'bg-green-100 text-green-700 border-green-200';
+    if (question.answers?.length > 0) return 'bg-blue-100 text-blue-700 border-blue-200';
+    return 'bg-gray-100 text-gray-600 border-gray-200';
   };
 
   const getStatusText = (question) => {
@@ -118,56 +128,93 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8 overflow-x-hidden">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2 break-words">Dashboard</h1>
-        <p className="text-sm sm:text-base text-gray-600 break-words">Manage your questions and track your learning progress</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Header */}
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-2 sm:p-3 rounded-xl shadow-lg">
+              <LayoutDashboard className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+                Dashboard
+              </h1>
+              <p className="text-sm sm:text-base text-gray-600">Track your learning progress</p>
+            </div>
+          </div>
+        </div>
 
-      {/* Stats Cards - Compact version */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6 md:mb-8">
-        <div className="bg-white p-2 sm:p-2.5 rounded-lg shadow-sm">
-          <h3 className="text-xs font-medium text-gray-600 mb-0.5 break-words">Total Questions</h3>
-          <p className="text-base sm:text-lg font-bold text-pink-600">{questions.length}</p>
-        </div>
-        <div className="bg-white p-2 sm:p-2.5 rounded-lg shadow-sm">
-          <h3 className="text-xs font-medium text-gray-600 mb-0.5 break-words">Your Points</h3>
-          <p className="text-base sm:text-lg font-bold text-green-600">{user?.points || 0}</p>
-        </div>
-        <div className="bg-white p-2 sm:p-2.5 rounded-lg shadow-sm">
-          <h3 className="text-xs font-medium text-gray-600 mb-0.5 break-words">Resolved Questions</h3>
-          <p className="text-base sm:text-lg font-bold text-blue-600">
-            {questions.filter(q => q.isResolved).length}
-          </p>
-        </div>
-        <div className="bg-white p-2 sm:p-2.5 rounded-lg shadow-sm">
-          <h3 className="text-xs font-medium text-gray-600 mb-0.5 break-words">Pending Answers</h3>
-          <p className="text-base sm:text-lg font-bold text-orange-600">
-            {questions.filter(q => !q.answers?.length).length}
-          </p>
-        </div>
-      </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="bg-pink-100 p-2 rounded-lg">
+                <MessageSquare className="w-5 h-5 text-pink-600" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{questions.length}</p>
+            <p className="text-xs sm:text-sm text-gray-600 font-medium">Total Questions</p>
+          </div>
 
-      {/* Filter Tabs */}
-      <div className="mb-6">
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-2 sm:space-x-4 md:space-x-8 overflow-x-auto">
+          <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="bg-green-100 p-2 rounded-lg">
+                <Award className="w-5 h-5 text-green-600" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{user?.points || 0}</p>
+            <p className="text-xs sm:text-sm text-gray-600 font-medium">Your Points</p>
+          </div>
+
+          <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="bg-blue-100 p-2 rounded-lg">
+                <CheckCircle className="w-5 h-5 text-blue-600" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
+              {questions.filter(q => q.isResolved).length}
+            </p>
+            <p className="text-xs sm:text-sm text-gray-600 font-medium">Resolved</p>
+          </div>
+
+          <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="bg-orange-100 p-2 rounded-lg">
+                <Clock className="w-5 h-5 text-orange-600" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
+              {questions.filter(q => !q.answers?.length).length}
+            </p>
+            <p className="text-xs sm:text-sm text-gray-600 font-medium">Pending</p>
+          </div>
+        </div>
+
+        {/* Filter Tabs */}
+        <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-4 mb-6 border border-gray-100">
+          <div className="flex items-center gap-2 mb-3">
+            <Filter className="w-4 h-4 text-gray-600" />
+            <span className="text-sm font-semibold text-gray-700">Filter Questions</span>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             <button
               onClick={() => setFilter('all')}
-              className={`py-2 px-2 sm:px-3 md:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
+              className={`px-4 py-2 rounded-xl font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${
                 filter === 'all'
-                  ? 'border-pink-500 text-pink-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               All Questions
             </button>
             <button
               onClick={() => setFilter('my')}
-              className={`py-2 px-2 sm:px-3 md:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
+              className={`px-4 py-2 rounded-xl font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${
                 filter === 'my'
-                  ? 'border-pink-500 text-pink-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               My Questions
@@ -176,135 +223,151 @@ const Dashboard = () => {
               <button
                 key={subject}
                 onClick={() => setFilter(subject)}
-                className={`py-2 px-2 sm:px-3 md:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
+                className={`px-4 py-2 rounded-xl font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${
                   filter === subject
-                    ? 'border-pink-500 text-pink-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {subject} ({categories[subject] || 0})
+                {subject} ({categories[subject]})
               </button>
             ))}
-          </nav>
+          </div>
         </div>
-      </div>
 
-      {/* Questions List */}
-      {loading ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto"></div>
-        </div>
-      ) : questions.length === 0 ? (
-        <div className="text-center py-12">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No questions found</h3>
-          <p className="text-gray-600 mb-4">
-            {filter === 'my' ? 'You haven\'t asked any questions yet.' : 'No questions in this category.'}
-          </p>
-          <Link
-            to="/ask"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700"
-          >
-            Ask Your First Question
-          </Link>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {questions.map((question) => (
-            <div key={question._id} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
-                  <Link to={`/question/${question._id}`} className="text-xl font-semibold text-gray-900 hover:text-pink-600">
-                    {question.title}
-                  </Link>
-                  <p className="text-gray-600 mt-2 line-clamp-2">{question.content}</p>
-                </div>
-                <div className="ml-4 flex-shrink-0">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(question)}`}>
-                    {getStatusText(question)}
-                  </span>
-                </div>
-              </div>
+        {/* Questions List */}
+        {questionsLoading ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-pink-200 rounded-full"></div>
+              <div className="w-16 h-16 border-4 border-pink-600 border-t-transparent rounded-full animate-spin absolute top-0"></div>
+            </div>
+            <p className="mt-4 text-gray-600 font-medium">Loading questions...</p>
+          </div>
+        ) : questions.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12 text-center border border-gray-100">
+            <div className="bg-gradient-to-r from-pink-100 to-purple-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MessageSquare className="w-10 h-10 text-pink-600" />
+            </div>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">No questions found</h3>
+            <p className="text-gray-600 mb-6 text-sm sm:text-base">
+              {filter === 'my' ? "You haven't asked any questions yet." : 'No questions in this category.'}
+            </p>
+            <Link
+              to="/ask"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold"
+            >
+              <Sparkles className="w-5 h-5" />
+              Ask Your First Question
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {questions.map((question) => (
+              <div key={question._id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
+                <div className="p-4 sm:p-6">
+                  {/* Question Header */}
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1 min-w-0">
+                      <Link to={`/question/${question._id}`} className="block">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 hover:text-pink-600 transition-colors duration-200 line-clamp-2">
+                          {question.title}
+                        </h3>
+                      </Link>
+                      <p className="text-sm sm:text-base text-gray-600 mt-2 line-clamp-2">{question.content}</p>
+                    </div>
+                    <div className="ml-4 flex-shrink-0">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(question)}`}>
+                        {getStatusText(question)}
+                      </span>
+                    </div>
+                  </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs sm:text-sm text-gray-500 space-y-2 sm:space-y-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="bg-gray-100 px-2 py-1 rounded text-xs sm:text-sm">{question.subject}</span>
-                  <span className="bg-gray-100 px-2 py-1 rounded text-xs sm:text-sm">Grade {question.grade}</span>
-                  <span className="text-xs sm:text-sm">{new Date(question.createdAt).toLocaleDateString()} at {new Date(question.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                </div>
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                  <span className="text-xs sm:text-sm">{question.views} views</span>
-                  <span className="text-xs sm:text-sm">•</span>
-                  <span className="text-xs sm:text-sm">{question.upvotes?.length || 0} upvotes</span>
-                  {user && question.author && (
-                    <>
-                      {String(question.author._id || question.author.id || '').trim() === String(user.id || user._id || '').trim() ? (
-                        <>
-                          <button
-                            onClick={() => handleResolveQuestion(question._id, question.isResolved)}
-                            className={`px-2 sm:px-3 py-1 rounded text-xs font-medium ${
-                              question.isResolved 
-                                ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
-                                : 'bg-green-500 text-white hover:bg-green-600'
-                            }`}
-                          >
-                            {question.isResolved ? 'Unresolve' : 'Resolve'}
-                          </button>
-                          <DeleteQuestionButton
-                            questionId={question._id}
-                            authorId={question.author._id || question.author.id || ''}
-                            onDelete={() => fetchQuestions()}
-                          />
-                        </>
-                      ) : null}
-                    </>
-                  )}
-                </div>
-              </div>
+                  {/* Question Meta */}
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <span className="bg-gradient-to-r from-pink-100 to-purple-100 text-pink-700 px-3 py-1 rounded-lg text-xs sm:text-sm font-semibold">
+                      {question.subject}
+                    </span>
+                    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-xs sm:text-sm font-semibold">
+                      Grade {question.grade}
+                    </span>
+                    <span className="text-xs sm:text-sm text-gray-500">
+                      {new Date(question.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
 
-              {question.aiAnswer && (
-                <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                  <h4 className="font-medium text-blue-900 mb-2">AI Answer:</h4>
-                  <p className="text-sm text-blue-700 line-clamp-3">{question.aiAnswer}</p>
-                </div>
-              )}
-
-              <div className="mt-4 flex items-center justify-between">
-                <div>
-                  {question.answers?.length > 0 && (
-                    <div className="mb-2">
-                      <h4 className="font-medium text-gray-900 mb-1">Community Answers ({question.answers.length})</h4>
-                      <div className="space-y-1">
-                        {question.answers.slice(0, 2).map((answer) => (
-                          <div key={answer._id} className="text-sm text-gray-600">
-                            <span className="font-medium">{answer.author?.username || 'Anonymous'}</span>: {answer.content.substring(0, 80)}...
-                          </div>
-                        ))}
+                  {/* Stats Row */}
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-4">
+                    <div className="flex items-center gap-1">
+                      <Eye className="w-4 h-4" />
+                      <span>{question.views}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <ThumbsUp className="w-4 h-4" />
+                      <span>{question.upvotes?.length || 0}</span>
+                    </div>
+                    {question.answers?.length > 0 && (
+                      <div className="flex items-center gap-1">
+                        <MessageSquare className="w-4 h-4" />
+                        <span>{question.answers.length} answers</span>
                       </div>
+                    )}
+                  </div>
+
+                  {/* AI Answer Preview */}
+                  {question.aiAnswer && (
+                    <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Sparkles className="w-4 h-4 text-blue-600" />
+                        <h4 className="font-semibold text-blue-900 text-sm">AI Answer</h4>
+                      </div>
+                      <p className="text-sm text-blue-700 line-clamp-2">{question.aiAnswer}</p>
                     </div>
                   )}
-                </div>
-                
-                <div className="flex space-x-2">
-                  <Link
-                    to={`/question/${question._id}`}
-                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700"
-                  >
-                    View Details
-                  </Link>
-                  {user && question.author && String(question.author._id || question.author.id || '').trim() !== String(user.id || user._id || '').trim() && (
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <Link
                       to={`/question/${question._id}`}
-                      className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold text-sm"
                     >
-                      Answer Question
+                      View Details
                     </Link>
-                  )}
+                    
+                    {user && question.author && 
+                      String(question.author._id || question.author.id || '').trim() === String(user.id || user._id || '').trim() ? (
+                      <>
+                        <button
+                          onClick={() => handleResolveQuestion(question._id, question.isResolved)}
+                          className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                            question.isResolved 
+                              ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                              : 'bg-green-500 text-white hover:bg-green-600 hover:shadow-md'
+                          }`}
+                        >
+                          {question.isResolved ? 'Unresolve' : 'Resolve'}
+                        </button>
+                        <DeleteQuestionButton
+                          questionId={question._id}
+                          authorId={question.author._id || question.author.id || ''}
+                          onDelete={() => fetchQuestions()}
+                        />
+                      </>
+                    ) : (
+                      <Link
+                        to={`/question/${question._id}`}
+                        className="px-4 py-2 border-2 border-pink-500 text-pink-600 rounded-xl hover:bg-pink-50 transition-all duration-200 font-semibold text-sm"
+                      >
+                        Answer
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

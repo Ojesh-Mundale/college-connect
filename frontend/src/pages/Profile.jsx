@@ -3,6 +3,22 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
 import Avatar from '../components/Avatar';
+import { 
+  User, 
+  Mail, 
+  Award, 
+  MessageSquare, 
+  Eye, 
+  CheckCircle, 
+  Clock,
+  Save,
+  LogOut,
+  Trash2,
+  RefreshCw,
+  Calendar,
+  TrendingUp,
+  Sparkles
+} from 'lucide-react';
 
 const Profile = () => {
   const { user, logout, updateUser } = useAuth();
@@ -11,7 +27,6 @@ const Profile = () => {
   const [currentAvatarSeed, setCurrentAvatarSeed] = useState(user?.customAvatarSeed || null);
   const [savingAvatar, setSavingAvatar] = useState(false);
 
-  // Function to get initials from name or email
   const getInitials = (name, email) => {
     if (name && name.trim()) {
       const parts = name.trim().split(' ');
@@ -24,7 +39,6 @@ const Profile = () => {
     return '?';
   };
 
-  // Function to handle account deletion
   const handleDeleteAccount = async () => {
     if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       try {
@@ -53,7 +67,7 @@ const Profile = () => {
       
       console.log('Fetching questions for user:', user.email);
       setLoading(true);
-      setQuestions([]); // Reset questions to prevent stale data
+      setQuestions([]);
       
       try {
         const token = localStorage.getItem('token');
@@ -68,7 +82,6 @@ const Profile = () => {
         
         console.log('API Response:', response.data.length, 'questions found');
         
-        // Ensure answers count is calculated correctly
         const questionsWithCounts = response.data.map(question => ({
           ...question,
           answersCount: question.answers ? question.answers.length : 0
@@ -90,8 +103,20 @@ const Profile = () => {
 
   if (!user) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold mb-4">Please login to view your profile</h2>
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex items-center justify-center px-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-12 text-center max-w-md border border-gray-100">
+          <div className="bg-gradient-to-r from-pink-100 to-purple-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <User className="w-10 h-10 text-pink-600" />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Access Denied</h2>
+          <p className="text-gray-600 mb-6">Please login to view your profile</p>
+          <Link
+            to="/login"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold"
+          >
+            Go to Login
+          </Link>
+        </div>
       </div>
     );
   }
@@ -116,105 +141,214 @@ const Profile = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-12">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex flex-col justify-center items-center px-4">
+        <div className="relative">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-pink-200 rounded-full"></div>
+          <div className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-pink-600 border-t-transparent rounded-full animate-spin absolute top-0"></div>
+        </div>
+        <p className="mt-6 text-gray-600 font-semibold text-lg">Loading profile...</p>
+      </div>
+    );
   }
 
+  const resolvedCount = questions.filter(q => q.isResolved).length;
+  const totalAnswers = questions.reduce((sum, q) => sum + (q.answersCount || 0), 0);
+  const totalViews = questions.reduce((sum, q) => sum + (q.views || 0), 0);
+
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <div className="flex items-center space-x-4">
-          <Avatar
-            user={user}
-            size={80}
-            showRefresh={true}
-            onRefresh={(newSeed) => setCurrentAvatarSeed(newSeed)}
-          />
-          <div>
-            <h1 className="text-2xl font-bold">{user.name}</h1>
-            <p className="text-gray-600">{user.email}</p>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 py-6 sm:py-8 px-4">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Profile Header */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-pink-500 via-purple-600 to-blue-600 h-24 sm:h-32"></div>
+          <div className="px-6 sm:px-8 pb-6 sm:pb-8">
+            <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6 -mt-12 sm:-mt-16">
+              <div className="flex-shrink-0">
+                <div className="bg-white p-2 rounded-2xl shadow-lg">
+                  <Avatar
+                    user={user}
+                    size={window.innerWidth < 640 ? 80 : 120}
+                    showRefresh={true}
+                    onRefresh={(newSeed) => setCurrentAvatarSeed(newSeed)}
+                  />
+                </div>
+              </div>
+              <div className="flex-1 text-center sm:text-left mt-2 sm:mt-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{user.name}</h1>
+                <div className="flex items-center justify-center sm:justify-start gap-2 text-gray-600 mt-1">
+                  <Mail className="w-4 h-4" />
+                  <p className="text-sm sm:text-base">{user.email}</p>
+                </div>
+                <div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
+                  <Award className="w-5 h-5 text-yellow-500" />
+                  <span className="text-lg font-bold text-pink-600">{user.points || 0} points</span>
+                </div>
+              </div>
+            </div>
+
+            {currentAvatarSeed !== (user?.customAvatarSeed || null) && (
+              <div className="mt-6 flex justify-center sm:justify-start">
+                <button
+                  onClick={handleSaveAvatar}
+                  disabled={savingAvatar}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-2.5 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-lg"
+                >
+                  {savingAvatar ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Save Avatar
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </div>
-        {currentAvatarSeed !== (user?.customAvatarSeed || null) && (
-          <div className="mt-4">
-            <button
-              onClick={handleSaveAvatar}
-              disabled={savingAvatar}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {savingAvatar ? 'Saving...' : 'Save Avatar'}
-            </button>
-          </div>
-        )}
-      </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-bold mb-4">My Questions ({questions.length})</h2>
-        
-        {questions.length === 0 ? (
-          <p className="text-gray-600">You haven't asked any questions yet.</p>
-        ) : (
-          <div className="space-y-4">
-            {questions.map((question) => (
-              <div key={question._id || question.id} className="border-b pb-4 hover:bg-gray-50 transition duration-200">
-                <Link 
-                  to={`/question/${question._id}`}
-                  className="block group"
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-2">
+              <div className="bg-pink-100 p-2 rounded-lg">
+                <MessageSquare className="w-5 h-5 text-pink-600" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{questions.length}</p>
+            <p className="text-xs sm:text-sm text-gray-600 font-medium">Questions</p>
+          </div>
+
+          <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-2">
+              <div className="bg-green-100 p-2 rounded-lg">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{resolvedCount}</p>
+            <p className="text-xs sm:text-sm text-gray-600 font-medium">Resolved</p>
+          </div>
+
+          <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-2">
+              <div className="bg-blue-100 p-2 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{totalAnswers}</p>
+            <p className="text-xs sm:text-sm text-gray-600 font-medium">Total Answers</p>
+          </div>
+
+          <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-2">
+              <div className="bg-purple-100 p-2 rounded-lg">
+                <Eye className="w-5 h-5 text-purple-600" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{totalViews}</p>
+            <p className="text-xs sm:text-sm text-gray-600 font-medium">Total Views</p>
+          </div>
+        </div>
+
+        {/* My Questions */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-pink-600 to-purple-600 px-4 sm:px-6 py-4 sm:py-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg sm:text-xl font-bold text-white">My Questions</h2>
+                <p className="text-xs sm:text-sm text-pink-100">{questions.length} total questions</p>
+              </div>
+              <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-white opacity-80" />
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-6">
+            {questions.length === 0 ? (
+              <div className="text-center py-8 sm:py-12">
+                <div className="bg-gradient-to-r from-pink-100 to-purple-100 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="w-8 h-8 sm:w-10 sm:h-10 text-pink-600" />
+                </div>
+                <p className="text-gray-600 mb-4 text-sm sm:text-base">You haven't asked any questions yet.</p>
+                <Link
+                  to="/ask"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold"
                 >
-                  <h3 className="text-lg font-semibold text-blue-600 group-hover:text-blue-800 transition duration-200">
-                    {question.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm mt-1 line-clamp-2">
-                    {question.content}
-                  </p>
-                  
-                  <div className="flex flex-wrap items-center gap-4 mt-3 text-sm">
-                    <span className="text-gray-600">
-                      <span className="font-medium">Category:</span> {question.subject}
-                    </span>
-                    
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      question.isResolved 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {question.isResolved ? 'Resolved' : 'Open'}
-                    </span>
-                    
-                    <span className="text-gray-600">
-                      <span className="font-medium">Answers:</span> {question.answersCount}
-                    </span>
-                    
-                    <span className="text-gray-600">
-                      <span className="font-medium">Views:</span> {question.views || 0}
-                    </span>
-                  </div>
-                  
-                  <div className="text-xs text-gray-500 mt-2">
-                    Asked on {new Date(question.createdAt).toLocaleDateString()}
-                  </div>
+                  <Sparkles className="w-5 h-5" />
+                  Ask Your First Question
                 </Link>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            ) : (
+              <div className="space-y-4">
+                {questions.map((question) => (
+                  <Link
+                    key={question._id || question.id}
+                    to={`/question/${question._id}`}
+                    className="block p-4 sm:p-5 border border-gray-200 rounded-xl hover:shadow-lg hover:border-pink-300 transition-all duration-300 group"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <h3 className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-pink-600 transition-colors duration-200 flex-1 line-clamp-2">
+                        {question.title}
+                      </h3>
+                      <span className={`ml-3 flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold border ${
+                        question.isResolved 
+                          ? 'bg-green-100 text-green-700 border-green-200' 
+                          : 'bg-yellow-100 text-yellow-700 border-yellow-200'
+                      }`}>
+                        {question.isResolved ? 'Resolved' : 'Open'}
+                      </span>
+                    </div>
 
-      {/* Account Actions */}
-      <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-        <h2 className="text-xl font-bold mb-4">Account Settings</h2>
-        <div className="space-y-3">
-          <button
-            onClick={logout}
-            className="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300"
-          >
-            Logout
-          </button>
-          <button
-            onClick={handleDeleteAccount}
-            className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300"
-          >
-            Delete Account
-          </button>
+                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                      {question.content}
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-gray-500">
+                      <span className="bg-gradient-to-r from-pink-100 to-purple-100 text-pink-700 px-3 py-1 rounded-lg font-semibold">
+                        {question.subject}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <TrendingUp className="w-4 h-4" />
+                        <span>{question.answersCount} answers</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Eye className="w-4 h-4" />
+                        <span>{question.views || 0} views</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        <span>{new Date(question.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Account Settings */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Account Settings</h2>
+          <div className="space-y-3 sm:space-y-4">
+            <button
+              onClick={logout}
+              className="w-full flex items-center justify-center gap-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 hover:shadow-lg"
+            >
+              <LogOut className="w-5 h-5" />
+              Logout
+            </button>
+            <button
+              onClick={handleDeleteAccount}
+              className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 hover:shadow-lg"
+            >
+              <Trash2 className="w-5 h-5" />
+              Delete Account
+            </button>
+          </div>
         </div>
       </div>
     </div>
