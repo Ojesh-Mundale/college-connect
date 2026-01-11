@@ -13,7 +13,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
-  const { sendConfirmation, googleLogin } = useAuth();
+  const { register, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -40,10 +40,10 @@ const Register = () => {
     setLoading(true);
 
     try {
-      await sendConfirmation(formData.username, formData.email, formData.password);
+      await register(formData.username, formData.email, formData.password);
       setConfirmationSent(true);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to send confirmation link');
+      setError(err.message || 'Failed to send confirmation link');
     } finally {
       setLoading(false);
     }

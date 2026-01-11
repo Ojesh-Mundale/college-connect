@@ -34,6 +34,32 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 50
   },
+  isOnboarded: {
+    type: Boolean,
+    default: false
+  },
+  fullName: {
+    type: String,
+    trim: true
+  },
+  grNo: {
+    type: String,
+    trim: true
+  },
+  department: {
+    type: String,
+    trim: true
+  },
+  year: {
+    type: Number,
+    min: 1,
+    max: 4
+  },
+  collegeEmail: {
+    type: String,
+    trim: true,
+    lowercase: true
+  },
   createdAt: {
     type: Date,
     default: Date.now

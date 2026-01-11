@@ -29,7 +29,8 @@ router.post('/login', async (req, res) => {
         email: user.email,
         avatar: user.avatar,
         customAvatarSeed: user.customAvatarSeed,
-        points: user.points
+        points: user.points,
+        isOnboarded: user.isOnboarded
       }
     });
   } catch (err) {
@@ -94,7 +95,8 @@ router.post('/google', async (req, res) => {
         username: dbUser.username,
         email: dbUser.email,
         avatar: dbUser.avatar,
-        points: dbUser.points
+        points: dbUser.points,
+        isOnboarded: dbUser.isOnboarded
       }
     });
 
@@ -112,7 +114,8 @@ router.get('/me', auth, async (req, res) => {
       username: req.user.username,
       email: req.user.email,
       avatar: req.user.avatar,
-      points: req.user.points
+      points: req.user.points,
+      isOnboarded: req.user.isOnboarded
     }
   });
 });

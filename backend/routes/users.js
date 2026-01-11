@@ -96,4 +96,52 @@ router.put('/avatar-seed', auth, async (req, res) => {
   }
 });
 
+/* ---------------- UPDATE ONBOARDING DETAILS ---------------- */
+router.put('/onboarding', auth, async (req, res) => {
+  try {
+    const { fullName, grNo, department, year, collegeEmail } = req.body;
+
+    // Validate required fields
+    if (!fullName || !grNo || !department || !year || !collegeEmail) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Validate year
+    if (year < 1 || year > 4) {
+      return res.status(400).json({ message: 'Year must be between 1 and 4' });
+    }
+
+    // Update user with onboarding details
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        fullName,
+        grNo,
+        department,
+        year,
+        collegeEmail,
+        isOnboarded: true
+      },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
+        points: user.points,
+        isOnboarded: user.isOnboarded
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

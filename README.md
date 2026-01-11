@@ -3,6 +3,16 @@
 ## 🎯 Problem Statement
 Many students in India, especially in Tier 2/3 cities, face challenges in getting timely and accurate answers to their academic doubts. Traditional tutoring is expensive, and online communities are often slow or unreliable. Existing platforms are cluttered with content from 1st to 12th grade, making it difficult for engineering students to find relevant solutions.
 
+## 👋 Onboarding Process
+New students must complete a one-time onboarding process after registration/login to provide essential student information:
+- **Full Name**: Complete student name
+- **GR Number**: College registration number
+- **Department**: Academic department (CSE, ECE, ME, CE, etc.)
+- **Year**: Academic year (1st, 2nd, 3rd, or 4th)
+- **College Email**: Official college email address
+
+This information is stored securely and uniquely for each student in the database.
+
 ## 🚀 Our Solution
 College Connect AI is a **college-specific** web-based platform that allows students to:
 - Ask academic questions tailored to their engineering curriculum

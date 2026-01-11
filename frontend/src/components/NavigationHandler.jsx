@@ -8,20 +8,37 @@ const NavigationHandler = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    // Check if we should navigate to dashboard after Google auth
-    const shouldNavigateToDashboard = sessionStorage.getItem('navigateToDashboard');
+    // Don't redirect if already on auth-related pages
+    const authPages = ['/login', '/register', '/confirm', '/onboarding'];
+    if (authPages.includes(location.pathname)) {
+      return;
+    }
 
-    console.log('🎯 NavigationHandler check:', {
-      shouldNavigateToDashboard,
-      user: !!user,
-      loading,
-      currentPath: location.pathname
-    });
+    if (!loading && user) {
+      // Check if we should navigate to dashboard after Google auth
+      const shouldNavigateToDashboard = sessionStorage.getItem('navigateToDashboard');
 
-    if (shouldNavigateToDashboard && user && !loading) {
-      console.log('🎯 NavigationHandler: Navigating to dashboard after Google auth');
-      sessionStorage.removeItem('navigateToDashboard');
-      navigate('/dashboard', { replace: true });
+      console.log('🎯 NavigationHandler check:', {
+        shouldNavigateToDashboard,
+        user: !!user,
+        isOnboarded: user.isOnboarded,
+        loading,
+        currentPath: location.pathname
+      });
+
+      // If user is not onboarded, redirect to onboarding
+      if (!user.isOnboarded) {
+        console.log('🎯 NavigationHandler: User not onboarded, redirecting to onboarding');
+        navigate('/onboarding', { replace: true });
+        return;
+      }
+
+      // If Google auth flag is set and user is onboarded, go to dashboard
+      if (shouldNavigateToDashboard && user.isOnboarded) {
+        console.log('🎯 NavigationHandler: Navigating to dashboard after Google auth');
+        sessionStorage.removeItem('navigateToDashboard');
+        navigate('/dashboard', { replace: true });
+      }
     }
   }, [user, loading, navigate, location.pathname]);
 

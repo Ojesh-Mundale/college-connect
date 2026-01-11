@@ -50,9 +50,8 @@ export const AuthProvider = ({ children }) => {
           setUser(user);
           console.log('👤 User set in state:', user);
 
-          // Trigger navigation to dashboard after successful Google authentication
-          console.log('🚀 Setting navigation flag for dashboard');
-          sessionStorage.setItem('navigateToDashboard', 'true');
+          // Navigation will be handled by NavigationHandler based on onboarding status
+          console.log('🚀 User authenticated, navigation will be handled by NavigationHandler');
         } catch (err) {
           console.error('❌ Google login failed:', err);
           console.error('❌ Error response:', err.response?.data);
@@ -118,6 +117,53 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Register with email/password
+  const register = async (username, email, password) => {
+    console.log('📝 Starting registration for:', email);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: username
+          }
+        }
+      });
+
+      if (error) {
+        console.error('❌ Supabase registration error:', error);
+        throw error;
+      }
+
+      console.log('✅ Registration initiated, confirmation email sent');
+      return { success: true, data };
+    } catch (err) {
+      console.error('❌ Registration failed:', err);
+      throw err;
+    }
+  };
+
+  // Create user in backend after confirmation
+  const createAfterConfirm = async (accessToken) => {
+    console.log('🔄 Creating user in backend after confirmation');
+    try {
+      const response = await api.post('/api/auth/confirm', {
+        accessToken
+      });
+
+      console.log('✅ User created in backend:', response.data);
+      const { token, user } = response.data;
+      localStorage.setItem('token', token);
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      setUser(user);
+      return response.data;
+    } catch (err) {
+      console.error('❌ Failed to create user after confirmation:', err);
+      throw err;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     delete api.defaults.headers.common['Authorization'];
@@ -129,14 +175,24 @@ export const AuthProvider = ({ children }) => {
     setUser(newUser);
   };
 
+  const updateOnboarding = async (onboardingData) => {
+    const res = await api.put('/api/users/onboarding', onboardingData);
+    setUser(res.data.user);
+    return res.data;
+  };
+
   return (
     <AuthContext.Provider
       value={{
         user,
         login,
+        register,
         googleLogin,
         logout,
         updateUser,
+        updateOnboarding,
+        createAfterConfirm,
+        supabase,
         loading
       }}
     >

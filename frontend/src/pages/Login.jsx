@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { LogIn, Mail, Lock, Sparkles } from 'lucide-react';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [collegeEmail, setCollegeEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,10 +14,17 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Validate college email
+    if (!collegeEmail.endsWith('@comp.sce.edu.in')) {
+      setError('Please use your college email ending with @comp.sce.edu.in');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await login(email, password);
+      await login(collegeEmail, password);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
@@ -64,10 +71,10 @@ const Login = () => {
                 </div>
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={collegeEmail}
+                  onChange={(e) => setCollegeEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your email"
+                  placeholder="Enter your college email"
                   required
                 />
               </div>
