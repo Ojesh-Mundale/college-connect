@@ -61,7 +61,7 @@ Provide a clear, accurate answer that is appropriate for an engineering student.
     return aiResponse;
   } catch (error) {
     console.error('AI service error:', error);
-    return 'Gravity is the force that attracts objects with mass toward each other. On Earth, it causes objects to fall toward the ground at 9.8 m/s² acceleration.';
+    return 'AI service not configured. Please add API keys to .env file.';
   }
 };
 

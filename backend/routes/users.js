@@ -75,7 +75,7 @@ router.put('/avatar-seed', auth, async (req, res) => {
       req.user._id,
       { customAvatarSeed },
       { new: true }
-    ).select('username email avatar customAvatarSeed points');
+    ).select('username email avatar customAvatarSeed points fullName contactNumber branch year collegeName isOnboarded');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -88,7 +88,13 @@ router.put('/avatar-seed', auth, async (req, res) => {
         email: user.email,
         avatar: user.avatar,
         customAvatarSeed: user.customAvatarSeed,
-        points: user.points
+        points: user.points,
+        fullName: user.fullName,
+        contactNumber: user.contactNumber,
+        branch: user.branch,
+        year: user.year,
+        collegeName: user.collegeName,
+        isOnboarded: user.isOnboarded
       }
     });
   } catch (error) {
@@ -99,10 +105,10 @@ router.put('/avatar-seed', auth, async (req, res) => {
 /* ---------------- UPDATE ONBOARDING DETAILS ---------------- */
 router.put('/onboarding', auth, async (req, res) => {
   try {
-    const { fullName, grNo, department, year, collegeEmail } = req.body;
+    const { fullName, contactNumber, branch, year, collegeName } = req.body;
 
     // Validate required fields
-    if (!fullName || !grNo || !department || !year || !collegeEmail) {
+    if (!fullName || !contactNumber || !branch || !year || !collegeName) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -116,10 +122,10 @@ router.put('/onboarding', auth, async (req, res) => {
       req.user._id,
       {
         fullName,
-        grNo,
-        department,
+        contactNumber,
+        branch,
         year,
-        collegeEmail,
+        collegeName,
         isOnboarded: true
       },
       { new: true }
@@ -137,6 +143,55 @@ router.put('/onboarding', auth, async (req, res) => {
         avatar: user.avatar,
         points: user.points,
         isOnboarded: user.isOnboarded
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+/* ---------------- UPDATE USER PROFILE ---------------- */
+router.put('/profile', auth, async (req, res) => {
+  try {
+    const { fullName, contactNumber, branch, year, collegeName } = req.body;
+
+    // Validate year if provided
+    if (year && (year < 1 || year > 4)) {
+      return res.status(400).json({ message: 'Year must be between 1 and 4' });
+    }
+
+    // Build update object with only provided fields
+    const updateData = {};
+    if (fullName !== undefined) updateData.fullName = fullName;
+    if (contactNumber !== undefined) updateData.contactNumber = contactNumber;
+    if (branch !== undefined) updateData.branch = branch;
+    if (year !== undefined) updateData.year = year;
+    if (collegeName !== undefined) updateData.collegeName = collegeName;
+
+    // Update user profile
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      updateData,
+      { new: true }
+    ).select('username email avatar customAvatarSeed points fullName contactNumber branch year collegeName');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
+        customAvatarSeed: user.customAvatarSeed,
+        points: user.points,
+        fullName: user.fullName,
+        contactNumber: user.contactNumber,
+        branch: user.branch,
+        year: user.year,
+        collegeName: user.collegeName
       }
     });
   } catch (err) {

@@ -1,85 +1,51 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import api from '../config/api';
+import { Loader, XCircle, CheckCircle, Mail } from 'lucide-react';
 
 const Confirm = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { createAfterConfirm, supabase } = useAuth();
+  const [success, setSuccess] = useState(false);
+  const { setUser } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    let isMounted = true;
+    const confirmEmail = async () => {
+      const token = searchParams.get('token');
 
-    const handleAuthStateChange = async (event, session) => {
-      if (event === 'SIGNED_IN' && session && isMounted) {
-        try {
-          await createAfterConfirm(session.access_token);
-          if (isMounted) {
-            setLoading(false);
-          }
-        } catch (err) {
-          console.error('Failed to create user after confirmation:', err);
-          if (isMounted) {
-            setError('Failed to confirm account');
-            setLoading(false);
-          }
-        }
+      if (!token) {
+        setError('No confirmation token provided');
+        setLoading(false);
+        return;
       }
-    };
 
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
+      try {
+        const res = await api.post('/api/auth/confirm', { token });
+        setSuccess(true);
+        setLoading(false);
 
-    // Check current session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session && isMounted) {
-        try {
-          await createAfterConfirm(session.access_token);
-          if (isMounted) {
-            setLoading(false);
-          }
-        } catch (err) {
-          console.error('Failed to create user after confirmation:', err);
-          if (isMounted) {
-            setError('Failed to confirm account');
-            setLoading(false);
-          }
-        }
-      } else if (isMounted) {
-        // Check for error parameters
-        const searchParams = new URLSearchParams(window.location.search);
-        let error = searchParams.get('error');
-        let errorDescription = searchParams.get('error_description');
-
-        if (!error) {
-          const hash = window.location.hash;
-          const hashParams = new URLSearchParams(hash.replace('#', '?'));
-          error = hashParams.get('error');
-          errorDescription = hashParams.get('error_description');
-        }
-
-        if (error) {
-          console.error('Magic link error:', errorDescription);
-          setError(`Link expired or invalid. Please try registering again.`);
-        } else {
-          setError('Confirmation link sent to your email. Please check your inbox and click the link to complete registration.');
-        }
+        // Show success message for 3 seconds, then redirect to login
+        setTimeout(() => {
+          navigate('/login');
+        }, 3000);
+      } catch (err) {
+        console.error('Confirmation error:', err);
+        setError(err.response?.data?.message || 'Failed to confirm email');
         setLoading(false);
       }
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
     };
-  }, [createAfterConfirm, supabase.auth]);
+
+    confirmEmail();
+  }, [searchParams, setUser, navigate]);
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto mb-4"></div>
+          <Loader className="animate-spin h-12 w-12 text-pink-600 mx-auto mb-4" />
           <p className="text-gray-600">Confirming your email...</p>
         </div>
       </div>
@@ -88,18 +54,14 @@ const Confirm = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
-          <div className="text-red-600 mb-4">
-            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="max-w-md w-full bg-white p-6 sm:p-8 rounded-2xl shadow-xl text-center">
+          <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Confirmation Failed</h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => navigate('/register')}
-            className="bg-pink-600 text-white py-2 px-4 rounded-lg hover:bg-pink-700"
+            className="w-full bg-pink-600 text-white py-2.5 sm:py-3 rounded-xl hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-300 font-semibold"
           >
             Back to Register
           </button>
@@ -108,26 +70,23 @@ const Confirm = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
-        <div className="text-green-600 mb-4">
-          <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="max-w-md w-full bg-white p-6 sm:p-8 rounded-2xl shadow-xl text-center">
+          <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Email Confirmed!</h2>
+          <p className="text-gray-600 mb-6">Your email is verified. Please login.</p>
+          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+            <Mail className="h-4 w-4" />
+            <span>Check your email for future notifications</span>
+          </div>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Account Verified!</h2>
-        <p className="text-gray-600 mb-6">Your account has been verified. Please login to continue.</p>
-        <p className="text-sm text-gray-500 mb-4">Website: https://college-connect-website.onrender.com</p>
-        <button
-          onClick={() => window.location.href = 'https://college-connect-website.onrender.com/login'}
-          className="bg-pink-600 text-white py-2 px-4 rounded-lg hover:bg-pink-700"
-        >
-          Go to Login
-        </button>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return null;
 };
 
 export default Confirm;

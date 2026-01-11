@@ -22,8 +22,7 @@ const AskQuestion = () => {
     subject: '',
     branch: '',
     year: '1st Year',
-    tags: '',
-    points: 1
+    points: 10
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -218,24 +217,7 @@ const AskQuestion = () => {
                 </p>
               </div>
 
-              {/* Tags */}
-              <div>
-                <label className="flex items-center gap-2 text-gray-700 text-sm font-semibold mb-2">
-                  <Tag className="w-4 h-4 text-orange-600" />
-                  Tags
-                </label>
-                <input
-                  type="text"
-                  name="tags"
-                  value={formData.tags}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200"
-                  placeholder="e.g. mechanics, thermodynamics, calculus"
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  Separate tags with commas to help others find your question
-                </p>
-              </div>
+
 
               {/* Points */}
               <div>
@@ -248,15 +230,13 @@ const AskQuestion = () => {
                     type="number"
                     name="points"
                     value={formData.points}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200"
-                    placeholder="1"
-                    min="1"
+                    disabled
+                    className="w-full px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed"
                     required
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  Offer points to incentivize quality answers (minimum 1 point)
+                  Points are fixed at 10 for all questions (Ask relevant questions only)
                 </p>
               </div>
 
@@ -289,7 +269,6 @@ const AskQuestion = () => {
                   <ul className="text-xs text-blue-700 space-y-1">
                     <li>• Be clear and specific in your question title</li>
                     <li>• Include relevant details and context</li>
-                    <li>• Add appropriate tags for better visibility</li>
                     <li>• Offer more points for complex questions</li>
                   </ul>
                 </div>

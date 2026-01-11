@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
 import Avatar from '../components/Avatar';
-import { 
-  User, 
-  Mail, 
-  Award, 
-  MessageSquare, 
-  Eye, 
-  CheckCircle, 
+import {
+  User,
+  Mail,
+  Award,
+  MessageSquare,
+  Eye,
+  CheckCircle,
   Clock,
   Save,
   LogOut,
@@ -17,7 +17,11 @@ import {
   RefreshCw,
   Calendar,
   TrendingUp,
-  Sparkles
+  Sparkles,
+  Pencil,
+  Building,
+  GraduationCap,
+  Phone
 } from 'lucide-react';
 
 const Profile = () => {
@@ -26,6 +30,15 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [currentAvatarSeed, setCurrentAvatarSeed] = useState(user?.customAvatarSeed || null);
   const [savingAvatar, setSavingAvatar] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState({
+    fullName: user?.fullName || '',
+    contactNumber: user?.contactNumber || '',
+    branch: user?.branch || '',
+    year: user?.year || '',
+    collegeName: user?.collegeName || ''
+  });
+  const [savingProfile, setSavingProfile] = useState(false);
 
   const getInitials = (name, email) => {
     if (name && name.trim()) {
@@ -140,6 +153,43 @@ const Profile = () => {
     }
   };
 
+  const handleEditProfile = () => {
+    setIsEditing(true);
+    setEditedProfile({
+      fullName: user?.fullName || '',
+      contactNumber: user?.contactNumber || '',
+      branch: user?.branch || '',
+      year: user?.year || '',
+      collegeName: user?.collegeName || ''
+    });
+  };
+
+  const handleSaveProfile = async () => {
+    setSavingProfile(true);
+    try {
+      const response = await api.put('/api/users/profile', editedProfile);
+      updateUser(editedProfile);
+      setIsEditing(false);
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Failed to update profile. Please try again.');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditedProfile({
+      fullName: user?.fullName || '',
+      contactNumber: user?.contactNumber || '',
+      branch: user?.branch || '',
+      year: user?.year || '',
+      collegeName: user?.collegeName || ''
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex flex-col justify-center items-center px-4">
@@ -209,6 +259,185 @@ const Profile = () => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Profile Information */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Profile Information</h2>
+            <button
+              onClick={handleEditProfile}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-4 py-2 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg"
+            >
+              <Pencil className="w-4 h-4" />
+              Edit Profile
+            </button>
+          </div>
+          {isEditing ? (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                      <User className="w-4 h-4" />
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={editedProfile.fullName}
+                      onChange={(e) => setEditedProfile({...editedProfile, fullName: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                      <Mail className="w-4 h-4" />
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={user.email}
+                      disabled
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                    />
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                      <Building className="w-4 h-4" />
+                      College Name
+                    </label>
+                    <input
+                      type="text"
+                      value={editedProfile.collegeName}
+                      onChange={(e) => setEditedProfile({...editedProfile, collegeName: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                      placeholder="Enter your college name"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                      <GraduationCap className="w-4 h-4" />
+                      Branch
+                    </label>
+                    <input
+                      type="text"
+                      value={editedProfile.branch}
+                      onChange={(e) => setEditedProfile({...editedProfile, branch: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                      placeholder="Enter your branch"
+                    />
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                      <Calendar className="w-4 h-4" />
+                      Year
+                    </label>
+                    <select
+                      value={editedProfile.year || ''}
+                      onChange={(e) => setEditedProfile({...editedProfile, year: e.target.value ? parseInt(e.target.value) : ''})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                    >
+                      <option value="">Select year</option>
+                      <option value="1">1st Year</option>
+                      <option value="2">2nd Year</option>
+                      <option value="3">3rd Year</option>
+                      <option value="4">4th Year</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                      <Phone className="w-4 h-4" />
+                      Contact Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={editedProfile.contactNumber}
+                      onChange={(e) => setEditedProfile({...editedProfile, contactNumber: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                      placeholder="Enter your contact number"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={handleCancelEdit}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={savingProfile}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-lg"
+                >
+                  {savingProfile ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Save Changes
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <User className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm text-gray-500">Full Name</p>
+                    <p className="text-base font-semibold text-gray-900">{user.fullName || 'Not provided'}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Mail className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="text-base font-semibold text-gray-900">{user.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Building className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm text-gray-500">College Name</p>
+                    <p className="text-base font-semibold text-gray-900">{user.collegeName || 'Not provided'}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <GraduationCap className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm text-gray-500">Branch</p>
+                    <p className="text-base font-semibold text-gray-900">{user.branch || 'Not provided'}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Calendar className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm text-gray-500">Year</p>
+                    <p className="text-base font-semibold text-gray-900">{user.year ? `${user.year}st Year` : 'Not provided'}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Phone className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm text-gray-500">Contact Number</p>
+                    <p className="text-base font-semibold text-gray-900">{user.contactNumber || 'Not provided'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Stats Grid */}

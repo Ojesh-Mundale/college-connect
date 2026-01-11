@@ -37,10 +37,10 @@ const NavigationHandler = () => {
       if (shouldNavigateToDashboard && user.isOnboarded) {
         console.log('🎯 NavigationHandler: Navigating to dashboard after Google auth');
         sessionStorage.removeItem('navigateToDashboard');
-        navigate('/dashboard', { replace: true });
+        navigate('/feed', { replace: true });
       }
     }
-  }, [user, loading, navigate, location.pathname]);
+  }, [user?.isOnboarded, loading, navigate, location.pathname]);
 
   return null; // This component doesn't render anything
 };

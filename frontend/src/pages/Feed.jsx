@@ -3,47 +3,35 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
 import DeleteQuestionButton from '../components/DeleteQuestionButton';
-import { 
-  LayoutDashboard, 
-  Award, 
-  CheckCircle, 
-  Clock, 
-  Eye, 
-  ThumbsUp, 
+import {
+  Rss,
+  Eye,
+  ThumbsUp,
   MessageSquare,
   Filter,
-  Search,
-  Sparkles,
-  TrendingUp
+  Sparkles
 } from 'lucide-react';
 
-const Dashboard = () => {
+const Feed = () => {
   const { user, loading } = useAuth();
   const [questions, setQuestions] = useState([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
   const [categories, setCategories] = useState({});
-  const [stats, setStats] = useState({
-    totalQuestions: 0,
-    userPoints: 0,
-    resolvedQuestions: 0,
-    pendingAnswers: 0
-  });
 
   useEffect(() => {
-    console.log('📊 Dashboard useEffect:', { user: !!user, loading, filter, searchTerm });
+    console.log('📊 Feed useEffect:', { user: !!user, loading, filter });
 
     if (!user && !loading) {
-      console.log('🚫 Dashboard: No user and not loading, redirecting to login');
+      console.log('🚫 Feed: No user and not loading, redirecting to login');
       window.location.href = '/login';
       return;
     }
     if (user) {
-      console.log('✅ Dashboard: User found, fetching questions');
+      console.log('✅ Feed: User found, fetching questions');
       fetchQuestions();
     }
-  }, [filter, user, searchTerm, loading]);
+  }, [filter, user, loading]);
 
   const fetchQuestions = async () => {
     try {
@@ -58,19 +46,9 @@ const Dashboard = () => {
 
       const response = await api.get(url);
       const questionsData = response.data.questions || [];
-      
+
       setQuestions(questionsData);
-      
-      const resolvedCount = questionsData.filter(q => q.isResolved).length;
-      const pendingCount = questionsData.filter(q => !q.answers?.length).length;
-      
-      setStats({
-        totalQuestions: questionsData.length,
-        userPoints: user?.points || 0,
-        resolvedQuestions: resolvedCount,
-        pendingAnswers: pendingCount
-      });
-      
+
       const counts = {};
       questionsData.forEach(q => {
         counts[q.subject] = (counts[q.subject] || 0) + 1;
@@ -134,63 +112,18 @@ const Dashboard = () => {
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-3 mb-3">
             <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-2 sm:p-3 rounded-xl shadow-lg">
-              <LayoutDashboard className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <Rss className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-                Dashboard
+                Feed
               </h1>
-              <p className="text-sm sm:text-base text-gray-600">Track your learning progress</p>
+              <p className="text-sm sm:text-base text-gray-600">Discover questions from the community</p>
             </div>
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-2">
-              <div className="bg-pink-100 p-2 rounded-lg">
-                <MessageSquare className="w-5 h-5 text-pink-600" />
-              </div>
-            </div>
-            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{questions.length}</p>
-            <p className="text-xs sm:text-sm text-gray-600 font-medium">Total Questions</p>
-          </div>
 
-          <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-2">
-              <div className="bg-green-100 p-2 rounded-lg">
-                <Award className="w-5 h-5 text-green-600" />
-              </div>
-            </div>
-            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{user?.points || 0}</p>
-            <p className="text-xs sm:text-sm text-gray-600 font-medium">Your Points</p>
-          </div>
-
-          <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-2">
-              <div className="bg-blue-100 p-2 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-blue-600" />
-              </div>
-            </div>
-            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
-              {questions.filter(q => q.isResolved).length}
-            </p>
-            <p className="text-xs sm:text-sm text-gray-600 font-medium">Resolved</p>
-          </div>
-
-          <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-2">
-              <div className="bg-orange-100 p-2 rounded-lg">
-                <Clock className="w-5 h-5 text-orange-600" />
-              </div>
-            </div>
-            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
-              {questions.filter(q => !q.answers?.length).length}
-            </p>
-            <p className="text-xs sm:text-sm text-gray-600 font-medium">Pending</p>
-          </div>
-        </div>
 
         {/* Filter Tabs */}
         <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-4 mb-6 border border-gray-100">
@@ -372,4 +305,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Feed;

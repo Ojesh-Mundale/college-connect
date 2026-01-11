@@ -31,12 +31,14 @@ const MobileNavbar = () => {
         {isOpen && (
           <div className="pb-4">
             <div className="flex flex-col space-y-3">
-              <Link to="/" className="text-gray-700 hover:text-pink-600 py-2" onClick={() => setIsOpen(false)}>
-                Home
-              </Link>
+              {!user && (
+                <Link to="/" className="text-gray-700 hover:text-pink-600 py-2" onClick={() => setIsOpen(false)}>
+                  Home
+                </Link>
+              )}
               {user && (
-                <Link to="/dashboard" className="text-gray-700 hover:text-pink-600 py-2" onClick={() => setIsOpen(false)}>
-                  Dashboard
+                <Link to="/feed" className="text-gray-700 hover:text-pink-600 py-2" onClick={() => setIsOpen(false)}>
+                  Feed
                 </Link>
               )}
               <Link to="/ask" className="text-gray-700 hover:text-pink-600 py-2" onClick={() => setIsOpen(false)}>

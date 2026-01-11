@@ -8,11 +8,13 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Confirm from './pages/Confirm';
+import CheckEmail from './pages/CheckEmail';
+import EmailConfirmed from './pages/EmailConfirmed';
 import Onboarding from './pages/Onboarding';
 import AskQuestion from './pages/AskQuestion';
 import QuestionDetail from './pages/QuestionDetail';
 import Profile from './pages/Profile';
-import Dashboard from './pages/Dashboard';
+import Feed from './pages/Feed';
 import Leaderboard from './pages/Leaderboard';
 
 function App() {
@@ -27,12 +29,14 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/check-email" element={<CheckEmail />} />
+              <Route path="/email-confirmed" element={<EmailConfirmed />} />
               <Route path="/confirm" element={<Confirm />} />
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/ask" element={<AskQuestion />} />
               <Route path="/question/:id" element={<QuestionDetail />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/feed" element={<Feed />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
             </Routes>
           </main>

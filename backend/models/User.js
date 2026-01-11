@@ -42,11 +42,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  grNo: {
+  contactNumber: {
     type: String,
     trim: true
   },
-  department: {
+  branch: {
     type: String,
     trim: true
   },
@@ -55,10 +55,9 @@ const userSchema = new mongoose.Schema({
     min: 1,
     max: 4
   },
-  collegeEmail: {
+  collegeName: {
     type: String,
-    trim: true,
-    lowercase: true
+    trim: true
   },
   createdAt: {
     type: Date,

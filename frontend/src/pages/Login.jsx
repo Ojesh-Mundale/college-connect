@@ -25,7 +25,7 @@ const Login = () => {
 
     try {
       await login(collegeEmail, password);
-      navigate('/dashboard');
+      navigate('/feed');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {

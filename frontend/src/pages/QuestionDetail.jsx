@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
 import DeleteQuestionButton from '../components/DeleteQuestionButton';
+import Avatar from '../components/Avatar';
 
 const QuestionDetail = () => {
   const { id } = useParams();
@@ -28,7 +29,7 @@ const QuestionDetail = () => {
       console.error('Error fetching question:', error);
       if (error.response?.status === 404) {
         alert('Question not found');
-        navigate('/dashboard');
+        navigate('/feed');
       }
     } finally {
       setLoading(false);
@@ -44,19 +45,15 @@ const QuestionDetail = () => {
       const response = await api.post('/api/answers', {
         content: newAnswer,
         questionId: id
-      }, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
       });
 
       // Add the new answer to the list
       setAnswers([response.data, ...answers]);
       setNewAnswer('');
-      
+
       // Show success message
       alert('Answer posted successfully!');
-      
+
       // Refresh question data to update counts
       fetchQuestion();
     } catch (error) {
@@ -68,7 +65,7 @@ const QuestionDetail = () => {
   };
 
   const handleDeleteQuestion = () => {
-    navigate('/dashboard');
+    navigate('/feed');
   };
 
   const canDeleteQuestion = () => {
@@ -96,11 +93,11 @@ const QuestionDetail = () => {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-gray-700 mb-4">Question Not Found</h2>
-          <button 
-            onClick={() => navigate('/dashboard')}
+          <button
+            onClick={() => navigate('/feed')}
             className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700"
           >
-            Back to Dashboard
+            Back to Feed
           </button>
         </div>
       </div>

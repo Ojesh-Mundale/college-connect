@@ -18,12 +18,14 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="text-gray-700 hover:text-pink-600 transition-colors">
-              Home
-            </Link>
+            {!user && (
+              <Link to="/" className="text-gray-700 hover:text-pink-600 transition-colors">
+                Home
+              </Link>
+            )}
             {user && (
-              <Link to="/dashboard" className="text-gray-700 hover:text-pink-600 transition-colors">
-                Dashboard
+              <Link to="/feed" className="text-gray-700 hover:text-pink-600 transition-colors">
+                Feed
               </Link>
             )}
             <Link to="/ask" className="text-gray-700 hover:text-pink-600 transition-colors">
@@ -80,20 +82,22 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         <div className={`${isOpen ? 'block' : 'hidden'} md:hidden border-t border-gray-200`}>
           <div className="py-4 space-y-3">
-            <Link 
-              to="/" 
-              className="block px-3 py-2 text-gray-700 hover:text-pink-600 hover:bg-gray-50 rounded-md transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              Home
-            </Link>
-            {user && (
-              <Link 
-                to="/dashboard" 
+            {!user && (
+              <Link
+                to="/"
                 className="block px-3 py-2 text-gray-700 hover:text-pink-600 hover:bg-gray-50 rounded-md transition-colors"
                 onClick={() => setIsOpen(false)}
               >
-                Dashboard
+                Home
+              </Link>
+            )}
+            {user && (
+              <Link
+                to="/feed"
+                className="block px-3 py-2 text-gray-700 hover:text-pink-600 hover:bg-gray-50 rounded-md transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                Feed
               </Link>
             )}
             <Link 

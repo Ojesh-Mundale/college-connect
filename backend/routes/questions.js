@@ -107,7 +107,7 @@ router.get('/:id', async (req, res) => {
 // Create question
 router.post('/', auth, async (req, res) => {
   try {
-    const { title, content, subject, branch, year, tags, points } = req.body;
+    const { title, content, subject, branch, year, points } = req.body;
 
     // Validate points
     const questionPoints = Math.max(1, parseInt(points) || 1);
@@ -126,7 +126,6 @@ router.post('/', auth, async (req, res) => {
       subject,
       branch,
       year,
-      tags: tags || [],
       points: questionPoints,
       author: req.user._id
     });
@@ -166,13 +165,12 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
-    const { title, content, subject, grade, tags } = req.body;
+    const { title, content, subject, grade } = req.body;
     
     question.title = title || question.title;
     question.content = content || question.content;
     question.subject = subject || question.subject;
     question.grade = grade || question.grade;
-    question.tags = tags || question.tags;
 
     await question.save();
     await question.populate('author', 'username avatar');

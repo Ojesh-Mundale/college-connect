@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, GraduationCap, Hash, Building, Calendar, CheckCircle, Sparkles } from 'lucide-react';
+import { User, Mail, GraduationCap, Hash, Building, Calendar, CheckCircle, Sparkles, Phone } from 'lucide-react';
 
 const Onboarding = () => {
   const [formData, setFormData] = useState({
     fullName: '',
-    grNo: '',
-    department: '',
+    contactNumber: '',
+    branch: '',
     year: '',
-    collegeEmail: ''
+    collegeName: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,7 +28,7 @@ const Onboarding = () => {
     setError('');
 
     // Validation
-    if (!formData.fullName || !formData.grNo || !formData.department || !formData.year || !formData.collegeEmail) {
+    if (!formData.fullName || !formData.contactNumber || !formData.branch || !formData.year || !formData.collegeName) {
       setError('All fields are required');
       return;
     }
@@ -42,7 +42,7 @@ const Onboarding = () => {
 
     try {
       await updateOnboarding(formData);
-      navigate('/dashboard');
+      navigate('/feed');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update profile');
     } finally {
@@ -92,42 +92,42 @@ const Onboarding = () => {
               </div>
             </div>
 
-            {/* GR Number */}
+            {/* Contact Number */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                GR Number
+                Contact Number
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Hash className="h-5 w-5 text-gray-400" />
+                  <Phone className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  type="text"
-                  name="grNo"
-                  value={formData.grNo}
+                  type="tel"
+                  name="contactNumber"
+                  value={formData.contactNumber}
                   onChange={handleChange}
                   className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors"
-                  placeholder="Enter your GR number"
+                  placeholder="Enter your contact number"
                 />
               </div>
             </div>
 
-            {/* Department */}
+            {/* Branch */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Department
+                Branch
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Building className="h-5 w-5 text-gray-400" />
+                  <GraduationCap className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   type="text"
-                  name="department"
-                  value={formData.department}
+                  name="branch"
+                  value={formData.branch}
                   onChange={handleChange}
                   className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors"
-                  placeholder="Enter your department"
+                  placeholder="Enter your branch"
                 />
               </div>
             </div>
@@ -156,22 +156,22 @@ const Onboarding = () => {
               </div>
             </div>
 
-            {/* College Email */}
+            {/* College Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                College Email
+                College Name
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  <Building className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  type="email"
-                  name="collegeEmail"
-                  value={formData.collegeEmail}
+                  type="text"
+                  name="collegeName"
+                  value={formData.collegeName}
                   onChange={handleChange}
                   className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors"
-                  placeholder="Enter your college email"
+                  placeholder="Enter your college name"
                 />
               </div>
             </div>
